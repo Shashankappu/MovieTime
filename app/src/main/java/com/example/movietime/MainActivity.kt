@@ -19,13 +19,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.movietime.model.Movie
-import com.example.movietime.movieservice.MovieService
 import com.example.movietime.ui.theme.MovieTimeTheme
+import com.example.movietime.utils.RetrofitInstance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+
 
 class MainActivity : ComponentActivity() {
     private val BASE_URL = "http://local_ip_address:port_number/"
@@ -41,6 +40,7 @@ class MainActivity : ComponentActivity() {
                     Greeting{
                         CoroutineScope(Dispatchers.IO).launch {
                             getAllMovies()
+                            getMovieById(1L)
                             for(movies in moviesList){
                                 Log.d(TAG,movies.toString())
                             }
@@ -50,18 +50,28 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-    private suspend fun getAllMovies(){
-        val api = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(MovieService::class.java)
 
+    private suspend fun getMovieById(movieId:Long) {
         try {
-            val movies = api.getMovies()
-            moviesList = movies
+            val movieById = RetrofitInstance.api.getMovieById(movieId)
+            Log.d(TAG, "movie by Id is : $movieById")
         } catch (e: Exception) {
-            Log.d(TAG, "Error fetching movies: ${e.message}")
+            Log.d(TAG, "Error fetching movies: $e")
+        }
+    }
+
+    private suspend fun getAllMovies(){
+        try {
+           val response = RetrofitInstance.api.getMovies()
+            if (response.isSuccessful){
+                response.body()?.let {
+                    moviesList = it
+                }
+            }else{
+                Log.d(TAG, "response error fetching movies: $response")
+            }
+        } catch (e: Exception) {
+            Log.d(TAG, "Error fetching movies: $e")
         }
     }
 }
