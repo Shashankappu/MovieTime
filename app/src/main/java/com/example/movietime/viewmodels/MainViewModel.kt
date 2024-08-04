@@ -1,6 +1,7 @@
 package com.example.movietime.viewmodels
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
@@ -12,9 +13,8 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(private val movieService: MovieService) : ViewModel(){
     private val TAG:String = "MainViewModel"
-    private val moviesList = MutableLiveData<List<Movie>>()
-
-    fun getMoviesList(): MutableLiveData<List<Movie>> = moviesList
+    private val _moviesList = MutableLiveData<List<Movie>>()
+    val moviesList: LiveData<List<Movie>> get() = _moviesList
     fun getMovieById(movieId:Long) = liveData(Dispatchers.IO) {
         try {
             val movieById :Movie  = movieService.getMovieById(movieId)
@@ -30,7 +30,7 @@ class MainViewModel(private val movieService: MovieService) : ViewModel(){
         viewModelScope.launch {
             try {
                 val movies = movieService.getMovies()
-                moviesList.postValue(movies)
+                _moviesList.postValue(movies)
             } catch (e: Exception) {
                 // Handle the error
                 Log.d(TAG,"$e")
