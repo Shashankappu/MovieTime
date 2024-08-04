@@ -68,4 +68,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.converter.gson)
     implementation(libs.retrofit)
+    implementation("io.insert-koin:koin-android:3.4.1")
+    // Koin Android Compatibility with Jetpack Compose
+    implementation("io.insert-koin:koin-androidx-compose:3.4.1")
 }
