@@ -1,4 +1,4 @@
-package com.example.movietime
+package com.example.movietime.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -18,18 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.movietime.model.Movie
 import com.example.movietime.ui.theme.MovieTimeTheme
-import com.example.movietime.utils.RetrofitInstance
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.movietime.viewmodels.MainViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class MainActivity : ComponentActivity() {
-    private val BASE_URL = "http://local_ip_address:port_number/"
-    private val TAG:String = "Shashank"
-    private var moviesList:List<Movie> = listOf()
+    private val TAG:String = "MainActivity"
+    private val viewModel: MainViewModel by viewModel()
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,44 +34,14 @@ class MainActivity : ComponentActivity() {
             MovieTimeTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) {
                     Greeting{
-                        CoroutineScope(Dispatchers.IO).launch {
-                            getAllMovies()
-                            getMovieById(1L)
-                            for(movies in moviesList){
-                                Log.d(TAG,movies.toString())
-                            }
-                        }
+                        viewModel.fetchMovies()
+                        Log.d(TAG,"${viewModel.getMoviesList().value}")
                     }
                 }
             }
         }
     }
-
-    private suspend fun getMovieById(movieId:Long) {
-        try {
-            val movieById = RetrofitInstance.api.getMovieById(movieId)
-            Log.d(TAG, "movie by Id is : $movieById")
-        } catch (e: Exception) {
-            Log.d(TAG, "Error fetching movies: $e")
-        }
-    }
-
-    private suspend fun getAllMovies(){
-        try {
-           val response = RetrofitInstance.api.getMovies()
-            if (response.isSuccessful){
-                response.body()?.let {
-                    moviesList = it
-                }
-            }else{
-                Log.d(TAG, "response error fetching movies: $response")
-            }
-        } catch (e: Exception) {
-            Log.d(TAG, "Error fetching movies: $e")
-        }
-    }
 }
-
 @Composable
 fun Greeting(onClick:()-> Unit) {
     Box(

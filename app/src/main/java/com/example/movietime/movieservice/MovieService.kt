@@ -9,7 +9,7 @@ import retrofit2.http.Path
 interface MovieService {
 
     @GET("movies")
-    suspend fun getMovies() : Response<List<Movie>>
+    suspend fun getMovies() : List<Movie>
 
     @GET("movies/{movieId}")
     suspend fun getMovieById(@Path("movieId") movieId: Long) : Movie
