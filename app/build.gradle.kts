@@ -72,4 +72,7 @@ dependencies {
     implementation("io.insert-koin:koin-android:3.4.1")
     // Koin Android Compatibility with Jetpack Compose
     implementation("io.insert-koin:koin-androidx-compose:3.4.1")
+    implementation ("androidx.compose.material:material:1.6.8")
+    implementation ("androidx.compose.foundation:foundation:1.6.8")
+    implementation  ("androidx.navigation:navigation-compose:2.4.0-alpha07")
 }
