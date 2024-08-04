@@ -58,7 +58,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                     Icon(
                         painter = painterResource(id = navItem.icon),
                         contentDescription = navItem.label,
-                        tint =  if (isSelected) orange else Color.Gray
+                        tint =  if (isSelected) orange else Color.Gray.copy(alpha = 0.3f)
                     )
                 },
 
