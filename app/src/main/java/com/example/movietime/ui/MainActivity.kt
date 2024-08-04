@@ -25,7 +25,6 @@ import com.example.movietime.ui.theme.MovieTimeTheme
 import com.example.movietime.viewmodels.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-
 class MainActivity : ComponentActivity() {
     private val TAG:String = "MainActivity"
     private val mainViewModel: MainViewModel by viewModel()
