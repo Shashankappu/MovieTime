@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -33,7 +32,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.movietime.R
@@ -46,7 +48,14 @@ private  val TAG = "HomeScreen"
 @Composable
 fun HomeScreen() {
     val mainViewModel: MainViewModel = koinViewModel()
-
+    val appNametext = buildAnnotatedString {
+        withStyle(style = SpanStyle(color = orange)) {
+            append("MoovY")
+        }
+        withStyle(style = SpanStyle(color = Color.White)) {
+            append(" Flix")
+        }
+    }
     LaunchedEffect(Unit) {
         mainViewModel.fetchMovies()
     }
@@ -54,7 +63,7 @@ fun HomeScreen() {
         modifier = Modifier.fillMaxSize()
     ){
         Text(
-            "MoovY Flix",
+            text = appNametext,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 20.dp),
             fontSize = 26.sp
         )
