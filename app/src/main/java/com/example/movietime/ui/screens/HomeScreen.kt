@@ -1,33 +1,34 @@
 package com.example.movietime.ui.screens
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.FloatState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -35,9 +36,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import com.example.movietime.R
 import com.example.movietime.ui.theme.orange
+import com.example.movietime.utils.MoviesData
 import com.example.movietime.viewmodels.MainViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -49,7 +50,9 @@ fun HomeScreen() {
     LaunchedEffect(Unit) {
         mainViewModel.fetchMovies()
     }
-    Column{
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ){
         Text(
             "MoovY Flix",
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 20.dp),
@@ -102,13 +105,18 @@ fun NowPlayingMovieCard(){
             modifier = Modifier
                 .size(230.dp, 70.dp)
                 .padding(start = 10.dp, bottom = 10.dp)
+                .clip(shape = RoundedCornerShape(30))
+                .background(Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xFFDADADA).copy(alpha=0.4f),
+                        Color(0xFFDADADA).copy(alpha=0.4f)
+                    )
+                ))
                 .align(Alignment.BottomStart)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .clip(shape = RoundedCornerShape(25))
-                    .background(color = Color.Gray.copy(alpha = 0.6f))
                     .fillMaxSize()
                     .padding(5.dp)
             ) {
@@ -141,11 +149,10 @@ fun NowPlayingMovieCard(){
 
 @Composable
 fun TrendingMovieCard(
-    resId :Int = R.drawable.movie_star_wars,
-    rating:Float = 7.0f,
-    title:String = "Star Wars:The Last Jedi",
+    movieData : MoviesData,
     alpha: Float=1f,
-    scale:Float = 1f
+    scale:Float = 1f,
+    onClick : () -> Unit = {}
 ){
     Box(
         modifier = Modifier
@@ -156,12 +163,15 @@ fun TrendingMovieCard(
                 scaleX = scale
                 scaleY = scale
             }
+            .clickable {
+                onClick()
+            }
             .clip(shape = RoundedCornerShape(12)),
         contentAlignment = Alignment.Center
     ) {
         Image(
             modifier = Modifier.fillMaxSize(),
-            painter = painterResource(id= resId),
+            painter = painterResource(id= movieData.image),
             contentDescription = "image",
             contentScale = ContentScale.Crop
         )
@@ -169,13 +179,18 @@ fun TrendingMovieCard(
             modifier = Modifier
                 .size(230.dp, 70.dp)
                 .padding(bottom = 10.dp)
-                .clip(shape = RoundedCornerShape(22))
-                .background(color = Color.Gray.copy(alpha = 0.6f))
+                .clip(shape = RoundedCornerShape(30))
+                .background(Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xFFDADADA).copy(alpha=0.4f),
+                        Color(0xFFDADADA).copy(alpha=0.4f)
+                    )
+                ))
                 .align(Alignment.BottomCenter),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = title,
+                text = movieData.title,
                 color = Color.White,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
@@ -185,8 +200,13 @@ fun TrendingMovieCard(
             modifier = Modifier
                 .padding(10.dp)
                 .size(75.dp, 50.dp)
-                .clip(shape = RoundedCornerShape(22))
-                .background(color = Color.Gray.copy(alpha = 0.6f))
+                .clip(shape = RoundedCornerShape(30))
+                .background(Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xFFDADADA).copy(alpha=0.5f),
+                        Color(0xFFDADADA).copy(alpha=0.5f)
+                    )
+                ))
                 .align(Alignment.TopEnd),
             contentAlignment = Alignment.Center
         ) {
@@ -216,7 +236,7 @@ fun TrendingMovieCard(
                 }
                 Spacer(modifier = Modifier.width(5.dp))
                 Text(
-                    text = rating.toString(),
+                    text = movieData.rating.toString(),
                     fontSize = 16.sp,
                     color = Color.White,
                     modifier = Modifier
@@ -228,24 +248,29 @@ fun TrendingMovieCard(
     }
 }
 
+val moviesData = listOf(
+    MoviesData("The God father",R.drawable.godfather,8.5f),
+    MoviesData("Star Wars",R.drawable.movie_star_wars,7.0f),
+    MoviesData("The Mongol",R.drawable.mongol2,6.0f),
+    MoviesData("THOR",R.drawable.thor,8.0f),
+    MoviesData("Avatar",R.drawable.avatar,6.0f),
+    MoviesData("Fire",R.drawable.fire,9.0f)
+)
+
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TrendingCarousel() {
-    val movieList = listOf(
-        R.drawable.movie_star_wars,
-        R.drawable.movie_star_wars,
-        R.drawable.movie_star_wars
-    )
-
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 50.dp),
-        horizontalArrangement = Arrangement.spacedBy(5.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        itemsIndexed(movieList) { index, movie ->
-            val alpha = if (index == 1) 1f else 0.5f // Dim the side items
-            val scale = if (index == 1) 1f else 0.85f // Scale the middle item larger
-
-            TrendingMovieCard(movie,5.5f,"Jingle Jingle",alpha,scale)
+    Box(modifier = Modifier.fillMaxSize()) {
+        val pagerState = rememberPagerState(initialPage = 1, pageCount = { moviesData.size })
+        HorizontalPager(
+            state = pagerState,
+            contentPadding= PaddingValues(horizontal = 55.dp, vertical = 5.dp),
+            modifier = Modifier.fillMaxSize(),
+        ) { index ->
+            val scale = if(pagerState.currentPage == index) 1.05f else 0.85f
+            val alpha = if(pagerState.currentPage == index) 1f else 0.85f
+            TrendingMovieCard(moviesData[index],scale = scale, alpha = alpha)
         }
     }
 }
