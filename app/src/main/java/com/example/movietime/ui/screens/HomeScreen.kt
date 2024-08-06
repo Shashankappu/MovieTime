@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -65,13 +66,13 @@ fun HomeScreen() {
         Text(
             text = appNametext,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 20.dp),
-            fontSize = 26.sp
+            fontSize = 24.sp
         )
         NowPlayingMovieCard()
         Text(
             "Trending",
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 20.dp),
-            fontSize = 26.sp
+            fontSize = 24.sp
         )
         TrendingCarousel()
     }
@@ -159,14 +160,14 @@ fun NowPlayingMovieCard(){
 @Composable
 fun TrendingMovieCard(
     movieData : MoviesData,
-    alpha: Float=1f,
-    scale:Float = 1f,
+    alpha: Float = 1f,
+    scale: Float = 1f,
     onClick : () -> Unit = {}
 ){
     Box(
         modifier = Modifier
             .padding(bottom = 20.dp)
-            .size(250.dp, 350.dp)
+            .size(260.dp, 350.dp)
             .alpha(alpha)
             .graphicsLayer {
                 scaleX = scale
@@ -180,7 +181,7 @@ fun TrendingMovieCard(
     ) {
         Image(
             modifier = Modifier.fillMaxSize(),
-            painter = painterResource(id= movieData.image),
+            painter = painterResource(id = movieData.image),
             contentDescription = "image",
             contentScale = ContentScale.Crop
         )
@@ -189,12 +190,14 @@ fun TrendingMovieCard(
                 .size(230.dp, 70.dp)
                 .padding(bottom = 10.dp)
                 .clip(shape = RoundedCornerShape(30))
-                .background(Brush.linearGradient(
-                    colors = listOf(
-                        Color(0xFFDADADA).copy(alpha=0.4f),
-                        Color(0xFFDADADA).copy(alpha=0.4f)
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(
+                            Color(0xFFDADADA).copy(alpha = 0.4f),
+                            Color(0xFFDADADA).copy(alpha = 0.4f)
+                        )
                     )
-                ))
+                )
                 .align(Alignment.BottomCenter),
             contentAlignment = Alignment.Center
         ) {
@@ -208,14 +211,16 @@ fun TrendingMovieCard(
         Box(
             modifier = Modifier
                 .padding(10.dp)
-                .size(75.dp, 50.dp)
+                .size(78.dp, 46.dp)
                 .clip(shape = RoundedCornerShape(30))
-                .background(Brush.linearGradient(
-                    colors = listOf(
-                        Color(0xFFDADADA).copy(alpha=0.5f),
-                        Color(0xFFDADADA).copy(alpha=0.5f)
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(
+                            Color(0xFFDADADA).copy(alpha = 0.5f),
+                            Color(0xFFDADADA).copy(alpha = 0.5f)
+                        )
                     )
-                ))
+                )
                 .align(Alignment.TopEnd),
             contentAlignment = Alignment.Center
         ) {
@@ -227,20 +232,28 @@ fun TrendingMovieCard(
                 verticalAlignment = Alignment.Bottom
             ){
                 Column(
-                    modifier = Modifier.wrapContentSize(Alignment.TopStart),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = "IMDb",
                         color = Color.White,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 8.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .weight(0.5f)
                     )
                     Icon(
                         painter = painterResource(id = R.drawable.star_rating_icon),
                         contentDescription = "Star",
-                        tint = Color(0xFFF3BE00)
+                        tint = Color(0xFFF3BE00),
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .weight(0.85f)
                     )
                 }
                 Spacer(modifier = Modifier.width(5.dp))
@@ -249,8 +262,9 @@ fun TrendingMovieCard(
                     fontSize = 16.sp,
                     color = Color.White,
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 20.dp)
+                        .fillMaxHeight()
+                        .weight(1f)
+                        .padding(top = 15.dp)
                 )
             }
         }
@@ -274,7 +288,7 @@ fun TrendingCarousel() {
         val pagerState = rememberPagerState(initialPage = 1, pageCount = { moviesData.size })
         HorizontalPager(
             state = pagerState,
-            contentPadding= PaddingValues(horizontal = 70.dp, vertical = 5.dp),
+            contentPadding= PaddingValues(horizontal = 50.dp, vertical = 5.dp),
             modifier = Modifier.fillMaxSize(),
         ) { index ->
             val scale = if(pagerState.currentPage == index) 1.05f else 0.85f
