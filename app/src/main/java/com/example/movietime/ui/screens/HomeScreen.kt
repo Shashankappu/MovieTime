@@ -108,7 +108,7 @@ fun NowPlayingMovieCard(){
             modifier = Modifier.fillMaxSize(),
             painter = painterResource(id= R.drawable.movie_sample_image),
             contentDescription = "image",
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.FillBounds
         )
         Box(
             modifier = Modifier
@@ -261,7 +261,7 @@ val moviesData = listOf(
     MoviesData("The God father",R.drawable.godfather,8.5f),
     MoviesData("Star Wars",R.drawable.movie_star_wars,7.0f),
     MoviesData("The Mongol",R.drawable.mongol2,6.0f),
-    MoviesData("THOR",R.drawable.thor,8.0f),
+    MoviesData("Thor",R.drawable.thor,8.0f),
     MoviesData("Avatar",R.drawable.avatar,6.0f),
     MoviesData("Fire",R.drawable.fire,9.0f)
 )
@@ -274,7 +274,7 @@ fun TrendingCarousel() {
         val pagerState = rememberPagerState(initialPage = 1, pageCount = { moviesData.size })
         HorizontalPager(
             state = pagerState,
-            contentPadding= PaddingValues(horizontal = 55.dp, vertical = 5.dp),
+            contentPadding= PaddingValues(horizontal = 70.dp, vertical = 5.dp),
             modifier = Modifier.fillMaxSize(),
         ) { index ->
             val scale = if(pagerState.currentPage == index) 1.05f else 0.85f
