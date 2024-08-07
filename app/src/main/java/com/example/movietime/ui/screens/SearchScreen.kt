@@ -8,16 +8,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.movietime.ui.theme.orange
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen() {
     // Column Composable,
@@ -97,29 +96,30 @@ fun SearchBox(){
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchTabs(){
     var selectedTabIndex by remember {
         mutableIntStateOf(0)
     }
     val tabTitles = listOf("Family","Comedy", "Adventure","Drama")
-    PrimaryTabRow(
+    ScrollableTabRow(
         selectedTabIndex = selectedTabIndex,
         modifier = Modifier
-            .padding(top = 20.dp, start = 10.dp)
-            .fillMaxWidth()
-            .height(30.dp),
+            .padding(top = 20.dp)
+            .height(50.dp)
+            .fillMaxWidth(),
+        edgePadding = 10.dp,
+        divider = {   },
         containerColor = Color.Transparent,
         contentColor = Color.White,
-        indicator = {
+        indicator = { tabPositions->
             TabRowDefaults.PrimaryIndicator(
                 Modifier
-                    .tabIndicatorOffset(selectedTabIndex, false)
-                    .width(100.dp)
+                    .padding(2.dp)
+                    .tabIndicatorOffset(tabPositions[selectedTabIndex])
                     .background(Color.Transparent),
                 color = orange,
-                height = 1.dp
+                height = 2.dp
             )
         }
     ) {
@@ -127,13 +127,12 @@ fun SearchTabs(){
             Tab(
                 selected = selectedTabIndex == index,
                 onClick = { selectedTabIndex = index },
-                modifier = Modifier
-                    .padding(horizontal = 2.dp),
                 text = {
                     Text(
                         text = title,
                         color = if (selectedTabIndex == index) orange else Color.White,
-                        fontSize = 16.sp
+                        fontSize = 16.sp,
+                        maxLines = 1,
                     )
                 }
             )
