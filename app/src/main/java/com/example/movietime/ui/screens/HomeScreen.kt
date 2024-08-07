@@ -271,12 +271,12 @@ fun TrendingMovieCard(
 }
 
 val moviesData = listOf(
-    MoviesData("The God father",R.drawable.godfather,8.5f),
-    MoviesData("Star Wars",R.drawable.movie_star_wars,7.0f),
-    MoviesData("The Mongol",R.drawable.mongol2,6.0f),
-    MoviesData("Thor",R.drawable.thor,8.0f),
-    MoviesData("Avatar",R.drawable.avatar,6.0f),
-    MoviesData("Fire",R.drawable.fire,9.0f)
+    MoviesData("The God father",R.drawable.godfather,8.5f,1983),
+    MoviesData("Star Wars",R.drawable.movie_star_wars,7.0f,2010),
+    MoviesData("The Mongol",R.drawable.mongol2,6.0f,2001),
+    MoviesData("Thor",R.drawable.thor,8.0f,2019),
+    MoviesData("Avatar",R.drawable.avatar,6.0f,2016),
+    MoviesData("Fire",R.drawable.fire,9.0f,2000)
 )
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
