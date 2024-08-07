@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 val appModule  = module {
     single {
         Retrofit.Builder()
-            .baseUrl("http://local_ip:8082/api/v1/")  //replace with actual IP and port
+            .baseUrl("http://192.168.1.10:8082/api/v1/")  //replace with actual IP and port
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
