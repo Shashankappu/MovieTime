@@ -60,7 +60,7 @@ fun SearchScreen() {
             fontWeight = FontWeight.Medium,
             lineHeight = 36.sp,
             modifier = Modifier
-                .padding(top = 36.dp, start = 24.dp)
+                .padding(top = 20.dp, start = 24.dp)
                 .size(283.dp, 72.dp)
         )
         SearchBox()
