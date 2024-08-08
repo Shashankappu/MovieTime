@@ -2,6 +2,7 @@ package com.example.movietime.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,7 +46,7 @@ import androidx.compose.ui.unit.sp
 import com.example.movietime.ui.theme.orange
 
 @Composable
-fun SearchScreen() {
+fun SearchScreen(onClick: () -> Unit) {
     // Column Composable,
     Column(
         modifier = Modifier
@@ -65,7 +66,7 @@ fun SearchScreen() {
         )
         SearchBox()
         GenreRecommendationTabLayout()
-        StaggeredMovieLayout()
+        StaggeredMovieLayout(onClick)
     }
 }
 
@@ -147,7 +148,7 @@ fun GenreRecommendationTabLayout(){
     }
 }
 @Composable
-fun StaggeredMovieLayout(){
+fun StaggeredMovieLayout(onClick : ()-> Unit){
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
         modifier = Modifier.fillMaxSize()
@@ -158,6 +159,9 @@ fun StaggeredMovieLayout(){
                 modifier = Modifier
                     .padding(10.dp)
                     .fillMaxSize()
+                    .clickable {
+                        onClick()
+                    }
             ) {
                 val height = if(index%2==0) 184.dp else 160.dp
                 Image(

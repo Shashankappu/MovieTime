@@ -8,9 +8,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.movietime.ui.screens.HomeScreen
+import com.example.movietime.ui.screens.MovieDetailsScreen
 import com.example.movietime.ui.screens.ProfileScreen
 import com.example.movietime.ui.screens.SearchScreen
-import com.example.movietime.viewmodels.MainViewModel
 
 @Composable
 fun NavHostContainer(
@@ -31,18 +31,30 @@ fun NavHostContainer(
 
             // route : Home
             composable("home") {
-                HomeScreen()
+                HomeScreen{
+                    navController.navigate("details")
+                }
             }
 
             // route : search
             composable("search") {
-                SearchScreen()
+                SearchScreen{
+                    navController.navigate("details")
+                }
             }
 
             // route : profile
             composable("profile") {
                 ProfileScreen()
             }
-        })
+
+            //route : details
+            composable("details"){
+                MovieDetailsScreen{
+                    navController.navigateUp()
+                }
+            }
+        }
+    )
 
 }

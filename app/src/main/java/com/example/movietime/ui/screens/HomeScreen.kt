@@ -46,7 +46,7 @@ import org.koin.androidx.compose.koinViewModel
 
 private  val TAG = "HomeScreen"
 @Composable
-fun HomeScreen() {
+fun HomeScreen(onClick: () -> Unit) {
     val mainViewModel: MainViewModel = koinViewModel()
     val appNametext = buildAnnotatedString {
         withStyle(style = SpanStyle(color = orange)) {
@@ -67,7 +67,7 @@ fun HomeScreen() {
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 20.dp),
             fontSize = 24.sp
         )
-        NowPlayingMovieCard()
+        NowPlayingMovieCard(onClick)
         Text(
             "Trending",
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 20.dp),
@@ -97,12 +97,13 @@ fun HomeScreen() {
 //}
 
 @Composable
-fun NowPlayingMovieCard(){
+fun NowPlayingMovieCard(onClick:()->Unit){
     Box(
         modifier = Modifier
             .padding(horizontal = 20.dp)
             .size(350.dp, 205.dp)
             .clip(shape = RoundedCornerShape(12))
+            .clickable { onClick() }
     ) {
         Image(
             modifier = Modifier.fillMaxSize(),
