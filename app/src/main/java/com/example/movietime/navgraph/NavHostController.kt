@@ -7,6 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.movietime.model.Genre
+import com.example.movietime.model.Movie
 import com.example.movietime.ui.screens.HomeScreen
 import com.example.movietime.ui.screens.MovieDetailsScreen
 import com.example.movietime.ui.screens.ProfileScreen
@@ -50,7 +52,12 @@ fun NavHostContainer(
 
             //route : details
             composable("details"){
-                MovieDetailsScreen{
+                val movie = Movie(
+                    1,"Star wars: The Last Jedi",
+                    9.5,123,
+                    "Somewhat a story",120,
+                    2016, listOf(Genre(1,"Family"),Genre(2,"Drama")))
+                MovieDetailsScreen(movie){
                     navController.navigateUp()
                 }
             }
