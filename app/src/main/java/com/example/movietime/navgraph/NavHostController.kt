@@ -22,16 +22,10 @@ fun NavHostContainer(
 
     NavHost(
         navController = navController,
-
-        // set the start destination as home
         startDestination = "home",
-
-        // Set the padding provided by scaffold
         modifier = Modifier.padding(paddingValues = padding),
-
         builder = {
 
-            // route : Home
             composable("home") {
                 HomeScreen{
                     navController.navigate("details")
@@ -56,7 +50,14 @@ fun NavHostContainer(
                     1,"Star wars: The Last Jedi",
                     9.5,123,
                     "Somewhat a story",120,
-                    2016, listOf(Genre(1,"Family"),Genre(2,"Drama")))
+                    2016,
+                    listOf(
+                        Genre(1,"Family"),
+                        Genre(2,"Drama"),
+                        Genre(3,"Action"),
+                        Genre(4,"Horror")
+                    )
+                )
                 MovieDetailsScreen(movie){
                     navController.navigateUp()
                 }

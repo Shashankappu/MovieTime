@@ -1,6 +1,5 @@
 package com.example.movietime.utils
 
-import androidx.compose.material3.Icon
 import com.example.movietime.R
 
 object Constants {
