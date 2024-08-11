@@ -14,7 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
@@ -24,6 +25,10 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +36,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.movietime.R
@@ -39,15 +46,13 @@ import com.example.movietime.ui.theme.orange
 
 @Composable
 fun MovieDetailsScreen(movie:Movie,onBackPressed : ()-> Unit){
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Top
-    ) {
-        MovieImageAndPlayComposable {
-            onBackPressed()
+    LazyColumn {
+        item{
+            MovieImageAndPlayComposable {
+                onBackPressed()
+            }
         }
-        MovieDetails(movie)
+        item{ MovieDetails(movie) }
     }
 }
 
@@ -96,8 +101,8 @@ fun MovieDetails(movie: Movie){
             )
         }
         Divider(modifier = Modifier
-            .width(320.dp)
-            .padding(top = 10.dp, start = 20.dp),
+            .width(380.dp)
+            .padding(top = 10.dp, start = 20.dp, end = 20.dp),
             color = Color(0xFF515151)
         )
         Column{
@@ -126,70 +131,142 @@ fun MovieDetails(movie: Movie){
                     .fillMaxWidth()
                     .padding(top = 10.dp, start = 20.dp),
                 verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.spacedBy(120.dp)
+                horizontalArrangement = Arrangement.spacedBy(60.dp)
             ) {
                 Text(
-                    text = "${movie.yearOfRelease}",
+                    text = "January 12, ${movie.yearOfRelease}",
                     modifier = Modifier,
-                    fontSize = 16.sp,
-                    color = Color.White
+                    fontSize = 12.sp,
+                    color = Color.Gray
                 )
-                Row {
-                    Box(
-                        modifier = Modifier
-                            .padding(2.dp)
-                            .wrapContentSize()
-                            .background(
-                                Brush.linearGradient(
-                                    colors = listOf(
-                                        Color(0x1FBCBCBC),
-                                        Color(0x0DFAF0CA)
-                                    )
+                 LazyRow(
+                     modifier = Modifier.padding(end=20.dp)
+                 ){
+                    items(movie.genres.size){ index ->
+                        Box(
+                            modifier = Modifier
+                                .padding(2.dp)
+                                .size(60.dp, 25.dp)
+                                .background(
+                                    Brush.linearGradient(
+                                        colors = listOf(
+                                            Color(0x1FBCBCBC),
+                                            Color(0x0DFAF0CA)
+                                        )
+                                    ),
+                                    shape = RoundedCornerShape(50)
                                 ),
-                                shape = RoundedCornerShape(40)
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = movie.genres[index].genreName,
+                                modifier = Modifier,
+                                fontSize = 12.sp,
+                                color = Color.Gray
                             )
-                    ) {
-                        Text(
-                            text = "Family",
-                            modifier = Modifier,
-                            fontSize = 16.sp,
-                            color = Color.Gray
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .padding(2.dp)
-                            .wrapContentSize()
-                            .background(
-                                Brush.linearGradient(
-                                    colors = listOf(
-                                        Color(0x1FBCBCBC),
-                                        Color(0x0DFAF0CA)
-                                    )
-                                ),
-                                shape = RoundedCornerShape(40)
-                            )
-                    ) {
-                        Text(
-                            text = "Drama",
-                            modifier = Modifier,
-                            fontSize = 16.sp,
-                            color = Color.Gray
-                        )
+                        }
                     }
                 }
-
             }
         }
         Divider(
             modifier = Modifier
-                .width(320.dp)
-                .padding(top = 10.dp, start = 20.dp),
+                .width(380.dp)
+                .padding(top = 10.dp, start = 20.dp, end = 20.dp),
             color = Color(0xFF515151)
         )
+        Text(
+            text = "Synopsis",
+            modifier = Modifier.padding(start=20.dp,top=10.dp),
+            fontSize = 16.sp,
+            color = Color.White
+        )
+        ReadMoreText()
+        Text(
+            text = "Related Movies",
+            modifier = Modifier.padding(start=20.dp,top=10.dp),
+            fontSize = 16.sp,
+            softWrap = true,
+            maxLines = 2,
+            color = Color.White
+        )
+        RelatedMoviesCarousel()
     }
 }
 
+@Composable
+fun RelatedMoviesCarousel(onClick:()->Unit = {}){
+    LazyRow(
+        modifier = Modifier
+            .padding(start = 20.dp, top = 10.dp, end = 20.dp)
+            .fillMaxWidth()
+    ) {
+        items(moviesData.size) { index->
+            val movie = moviesData[index]
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 5.dp)
+                    .clickable {
+                        onClick()
+                    }
+            ) {
+                Image(
+                    painter = painterResource(id = movie.image),
+                    contentDescription = "movie image",
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16))
+                        .height(110.dp)
+                        .width(150.dp),
+                    contentScale = ContentScale.FillBounds
+                )
+                Text(
+                    text = "${movie.title}\n(${movie.yearOfRelease})",
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16))
+                        .height(50.dp)
+                        .width(150.dp),
+                    maxLines = 2,
+                    lineHeight = 14.sp
+                )
+            }
+        }
+    }
+}
+val summarySample =  """Rey (Daisy Ridley) finally manages to find the legendary Jedi knight, Luke Skywalker (Mark Hamill) on an island with a magical aura. The heroes of The Force Awakens including Leia, Finn"""
+@Composable
+fun ReadMoreText(synopsis:String=summarySample){
+
+    val minimumLineLength = 3
+    var expandedState by remember { mutableStateOf(false) }
+    var showReadMoreButtonState by remember { mutableStateOf(false) }
+    val maxLines = if (expandedState) 200 else minimumLineLength
+
+    Column(modifier = Modifier.padding(start = 20.dp, end = 30.dp)) {
+        Text(
+            text = synopsis,
+            fontSize = 12.sp,
+            overflow = TextOverflow.Ellipsis,                   //Make sure to add this line
+            maxLines = maxLines,
+            onTextLayout = { textLayoutResult: TextLayoutResult ->
+                if (textLayoutResult.lineCount > minimumLineLength-1) {           //Adding this check to avoid ArrayIndexOutOfBounds Exception
+                    if (textLayoutResult.isLineEllipsized(minimumLineLength-1)) showReadMoreButtonState = true
+                }
+            }
+        )
+        if (showReadMoreButtonState) {
+            Text(
+                text = if (expandedState) "Read Less" else "Read More",
+                color = Color.Gray,
+                fontSize = 14.sp,
+                modifier = Modifier.clickable {
+                    expandedState = !expandedState
+                },
+            )
+        }
+    }
+}
 @Composable
 fun MovieImageAndPlayComposable(onBackPressed : ()-> Unit){
     Box{
