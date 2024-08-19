@@ -1,7 +1,9 @@
 package com.example.movietime.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,11 +19,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -155,7 +157,8 @@ fun MovieDetails(movie: Movie){
                                         )
                                     ),
                                     shape = RoundedCornerShape(50)
-                                ),
+                                )
+                                .border(BorderStroke(1.dp,Color.Gray.copy(0.4f)),RoundedCornerShape(50)),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
@@ -282,7 +285,6 @@ fun MovieImageAndPlayComposable(onBackPressed : ()-> Unit){
             modifier = Modifier
                 .padding(top = 25.dp, start = 20.dp)
                 .clip(RoundedCornerShape(50))
-                .background(color = Color.Black.copy(0.5f))
                 .clickable { onBackPressed() }
         ) {
             Icon(
@@ -296,8 +298,11 @@ fun MovieImageAndPlayComposable(onBackPressed : ()-> Unit){
             modifier = Modifier
                 .padding(top = 110.dp, start = 145.dp)
                 .size(64.dp)
-                .clip(RoundedCornerShape(50))
-                .background(color = Color.White.copy(0.3f)),
+                .background(
+                    color = Color.White.copy(0.3f),
+                    shape = RoundedCornerShape(50)
+                )
+                .border(BorderStroke(2.dp,Color.Gray.copy(0.4f)),RoundedCornerShape(50)),
             contentAlignment = Alignment.Center
         ) {
             Icon(

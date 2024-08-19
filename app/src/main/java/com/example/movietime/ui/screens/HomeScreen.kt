@@ -1,9 +1,11 @@
 package com.example.movietime.ui.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -115,13 +117,13 @@ fun NowPlayingMovieCard(onClick:()->Unit){
             modifier = Modifier
                 .size(230.dp, 70.dp)
                 .padding(start = 10.dp, bottom = 10.dp)
-                .clip(shape = RoundedCornerShape(30))
                 .background(Brush.linearGradient(
                     colors = listOf(
                         Color(0xFFDADADA).copy(alpha=0.4f),
                         Color(0xFFDADADA).copy(alpha=0.4f)
                     )
-                ))
+                ),shape = RoundedCornerShape(30))
+                .border(BorderStroke(2.dp,Color.Gray.copy(0.4f)),RoundedCornerShape(30))
                 .align(Alignment.BottomStart)
         ) {
             Row(
@@ -189,15 +191,16 @@ fun TrendingMovieCard(
             modifier = Modifier
                 .size(230.dp, 70.dp)
                 .padding(bottom = 10.dp)
-                .clip(shape = RoundedCornerShape(30))
                 .background(
                     Brush.linearGradient(
                         colors = listOf(
                             Color(0xFFDADADA).copy(alpha = 0.4f),
                             Color(0xFFDADADA).copy(alpha = 0.4f)
                         )
-                    )
+                    ),
+                    shape = RoundedCornerShape(30)
                 )
+                .border(BorderStroke(2.dp,Color.Gray.copy(0.4f)),RoundedCornerShape(30))
                 .align(Alignment.BottomCenter),
             contentAlignment = Alignment.Center
         ) {
@@ -212,15 +215,16 @@ fun TrendingMovieCard(
             modifier = Modifier
                 .padding(10.dp)
                 .size(78.dp, 46.dp)
-                .clip(shape = RoundedCornerShape(30))
                 .background(
                     Brush.linearGradient(
                         colors = listOf(
                             Color(0xFFDADADA).copy(alpha = 0.5f),
                             Color(0xFFDADADA).copy(alpha = 0.5f)
                         )
-                    )
+                    ),
+                    shape = RoundedCornerShape(30)
                 )
+                .border(BorderStroke(2.dp,Color.Gray.copy(0.4f)),RoundedCornerShape(30))
                 .align(Alignment.TopEnd),
             contentAlignment = Alignment.Center
         ) {
@@ -253,7 +257,7 @@ fun TrendingMovieCard(
                         tint = Color(0xFFF3BE00),
                         modifier = Modifier
                             .fillMaxHeight()
-                            .weight(0.85f)
+                            .weight(0.5f)
                     )
                 }
                 Spacer(modifier = Modifier.width(5.dp))
