@@ -1,34 +1,237 @@
 package com.example.movietime.ui.screens
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Icon
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.movietime.R
+import com.example.movietime.model.Genre
+import com.example.movietime.model.Movie
+import com.example.movietime.ui.theme.orange
+
 @Composable
 fun ProfileScreen() {
-    // Column Composable,
+    val movie = Movie(
+        1,"Star wars: The Last Jedi",
+        9.5,123,
+        "Somewhat a story",120,
+        2016,
+        listOf(
+            Genre(1,"Family"),
+            Genre(2,"Drama"),
+            Genre(3,"Action"),
+            Genre(4,"Horror")
+        )
+    )
     Column(
         modifier = Modifier
-            .fillMaxSize(),
-        // parameters set to place the items in center
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .fillMaxSize()
+            .padding(start = 10.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Top,
     ) {
-        // Icon Composable
-        Icon(
-            imageVector = Icons.Default.Person,
-            contentDescription = "Profile",
-            tint = Color(0xFF0F9D58)
+        Text(
+            text = "Profile",
+            color = Color.White,
+            modifier = Modifier
+                .padding(start = 140.dp, top = 20.dp)
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally),
+            fontSize = 22.sp
         )
-        // Text to Display the current Screen
-        Text(text = "Profile", color = Color.Black)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(top = 20.dp),
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.spacedBy((-35).dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.avatar),
+                    contentDescription = "profile image",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(RoundedCornerShape(50))
+                        .border(
+                            border = BorderStroke(2.dp, Color.Gray.copy(0.4f)),
+                            shape = RoundedCornerShape(50)
+                        ),
+                    contentScale = ContentScale.FillBounds
+                )
+                Image(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "profile image",
+                    modifier = Modifier
+                        .size(35.dp)
+                        .clip(RoundedCornerShape(50))
+                        .border(
+                            border = BorderStroke(2.dp, Color.Gray.copy(0.4f)),
+                            shape = RoundedCornerShape(50)
+                        )
+                        .background(orange),
+                    contentScale = ContentScale.Inside
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .wrapContentSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = "Shashank",
+                    color = Color.White,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally),
+                    fontSize = 18.sp
+                )
+                Text(
+                    text = "shashanksp1512@gmail.com",
+                    color = Color.White,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally),
+                    fontSize = 16.sp,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                )
+            }
+        }
+        Text(
+            text = "Favourite Genres:",
+            color = Color.White,
+            modifier = Modifier
+                .padding(start = 10.dp, top = 20.dp)
+                .fillMaxWidth(),
+            fontSize = 18.sp
+        )
+        Row(
+            modifier = Modifier.padding(start = 10.dp, end=20.dp,top = 10.dp)
+        ) {
+            var times = movie.genres.size
+            repeat(times) {
+                times--
+                Box(
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .size(60.dp, 25.dp)
+                        .background(
+                            Brush.linearGradient(
+                                colors = listOf(
+                                    Color(0x1FBCBCBC),
+                                    Color(0x0DFAF0CA)
+                                )
+                            ),
+                            shape = RoundedCornerShape(50)
+                        )
+                        .border(
+                            BorderStroke(1.dp, Color.Gray.copy(0.4f)),
+                            RoundedCornerShape(50)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = movie.genres[times].genreName,
+                        modifier = Modifier,
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                }
+            }
+        }
+        Text(
+            text = "Watched Movies :",
+            color = Color.White,
+            modifier = Modifier
+                .padding(start = 10.dp, top = 20.dp)
+                .fillMaxWidth(),
+            fontSize = 24.sp
+        )
+        Column(
+            modifier = Modifier.padding(top = 10.dp)
+        ){
+            WatchedMoviesCarousel()
+            WatchedMoviesCarousel()
+            WatchedMoviesCarousel()
+        }
+    }
+}
+
+@Composable
+fun WatchedMoviesCarousel(onClick:()->Unit = {}){
+    LazyRow(
+        modifier = Modifier
+            .padding(top = 10.dp, start = 5.dp, end = 20.dp)
+            .fillMaxWidth()
+    ) {
+        items(moviesData.size) { index->
+            val movie = moviesData[index]
+            Column(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(horizontal = 10.dp)
+                    .clickable {
+                        onClick()
+                    },
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.Start
+            ) {
+                Image(
+                    painter = painterResource(id = movie.image),
+                    contentDescription = "movie image",
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16))
+                        .height(110.dp)
+                        .width(150.dp),
+                    contentScale = ContentScale.FillBounds
+                )
+                Text(
+                    text = "${movie.title}\n(${movie.yearOfRelease})",
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .height(50.dp)
+                        .width(150.dp),
+                    maxLines = 2,
+                    lineHeight = 14.sp
+                )
+            }
+        }
     }
 }

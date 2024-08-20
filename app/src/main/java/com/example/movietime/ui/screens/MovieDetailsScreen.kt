@@ -16,9 +16,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.PlayArrow
@@ -48,13 +49,24 @@ import com.example.movietime.ui.theme.orange
 
 @Composable
 fun MovieDetailsScreen(movie:Movie,onBackPressed : ()-> Unit){
-    LazyColumn {
-        item{
-            MovieImageAndPlayComposable {
-                onBackPressed()
-            }
-        }
-        item{ MovieDetails(movie) }
+    Column(
+        modifier = Modifier.verticalScroll(rememberScrollState())
+    ) {
+        CurrentMovieImage()
+        MovieDetails(movie)
+    }
+    Box(
+        modifier = Modifier
+            .padding(top = 25.dp, start = 20.dp)
+            .clip(RoundedCornerShape(50))
+            .clickable { onBackPressed() }
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+            contentDescription = "back icon",
+            modifier = Modifier.size(42.dp),
+            tint = Color.White
+        )
     }
 }
 
@@ -158,7 +170,10 @@ fun MovieDetails(movie: Movie){
                                     ),
                                     shape = RoundedCornerShape(50)
                                 )
-                                .border(BorderStroke(1.dp,Color.Gray.copy(0.4f)),RoundedCornerShape(50)),
+                                .border(
+                                    BorderStroke(1.dp, Color.Gray.copy(0.4f)),
+                                    RoundedCornerShape(50)
+                                ),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
@@ -227,7 +242,6 @@ fun RelatedMoviesCarousel(onClick:()->Unit = {}){
                     text = "${movie.title}\n(${movie.yearOfRelease})",
                     fontSize = 12.sp,
                     modifier = Modifier
-                        .clip(RoundedCornerShape(16))
                         .height(50.dp)
                         .width(150.dp),
                     maxLines = 2,
@@ -271,7 +285,7 @@ fun ReadMoreText(synopsis:String=summarySample){
     }
 }
 @Composable
-fun MovieImageAndPlayComposable(onBackPressed : ()-> Unit){
+fun CurrentMovieImage(){
     Box{
         Image(
             painter = painterResource(id = R.drawable.movie_star_wars),
@@ -283,26 +297,13 @@ fun MovieImageAndPlayComposable(onBackPressed : ()-> Unit){
         )
         Box(
             modifier = Modifier
-                .padding(top = 25.dp, start = 20.dp)
-                .clip(RoundedCornerShape(50))
-                .clickable { onBackPressed() }
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = "back icon",
-                modifier = Modifier.size(42.dp),
-                tint = Color.White
-            )
-        }
-        Box(
-            modifier = Modifier
                 .padding(top = 110.dp, start = 145.dp)
                 .size(64.dp)
                 .background(
                     color = Color.White.copy(0.3f),
                     shape = RoundedCornerShape(50)
                 )
-                .border(BorderStroke(2.dp,Color.Gray.copy(0.4f)),RoundedCornerShape(50)),
+                .border(BorderStroke(2.dp, Color.Gray.copy(0.4f)), RoundedCornerShape(50)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
