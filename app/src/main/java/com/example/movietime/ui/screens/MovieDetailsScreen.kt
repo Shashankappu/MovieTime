@@ -4,7 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.movietime.R
+import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.model.Movie
 import com.example.movietime.ui.theme.orange
 
@@ -59,7 +59,7 @@ fun MovieDetailsScreen(movie:Movie,onBackPressed : ()-> Unit){
         modifier = Modifier
             .padding(top = 25.dp, start = 20.dp)
             .clip(RoundedCornerShape(50))
-            .clickable { onBackPressed() }
+            .clickableWithoutRipple { onBackPressed() }
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -225,7 +225,7 @@ fun RelatedMoviesCarousel(onClick:()->Unit = {}){
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 5.dp)
-                    .clickable {
+                    .clickableWithoutRipple {
                         onClick()
                     }
             ) {
@@ -277,7 +277,7 @@ fun ReadMoreText(synopsis:String=summarySample){
                 text = if (expandedState) "Read Less" else "Read More",
                 color = Color.Gray,
                 fontSize = 14.sp,
-                modifier = Modifier.clickable {
+                modifier = Modifier.clickableWithoutRipple {
                     expandedState = !expandedState
                 },
             )

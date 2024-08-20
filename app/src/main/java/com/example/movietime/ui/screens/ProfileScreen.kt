@@ -4,7 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.movietime.R
+import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.model.Genre
 import com.example.movietime.model.Movie
 import com.example.movietime.ui.theme.orange
@@ -61,15 +61,6 @@ fun ProfileScreen() {
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top,
     ) {
-        Text(
-            text = "Profile",
-            color = Color.White,
-            modifier = Modifier
-                .padding(start = 140.dp, top = 20.dp)
-                .fillMaxWidth()
-                .align(Alignment.CenterHorizontally),
-            fontSize = 22.sp
-        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -207,7 +198,7 @@ fun WatchedMoviesCarousel(onClick:()->Unit = {}){
                 modifier = Modifier
                     .wrapContentSize()
                     .padding(horizontal = 10.dp)
-                    .clickable {
+                    .clickableWithoutRipple {
                         onClick()
                     },
                 verticalArrangement = Arrangement.SpaceEvenly,

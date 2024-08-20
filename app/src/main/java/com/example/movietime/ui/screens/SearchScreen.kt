@@ -2,7 +2,6 @@ package com.example.movietime.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,6 +42,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.ui.theme.orange
 
 @Composable
@@ -72,9 +72,7 @@ fun SearchScreen(onClick: () -> Unit) {
 
 @Composable
 fun SearchBox(){
-    var query by remember {
-        mutableStateOf("")
-    }
+    var query by remember { mutableStateOf("") }
     TextField(
         value = query,
         onValueChange = { query = it },
@@ -92,10 +90,10 @@ fun SearchBox(){
         enabled = true,
         textStyle = TextStyle(textAlign = TextAlign.Left, fontSize = 16.sp),
         modifier = Modifier
-            .padding(start = 20.dp, top = 10.dp)
+            .padding(start = 20.dp, bottom = 15.dp)
             .size(328.dp, 48.dp)
-            .background(Color.Transparent, shape = RoundedCornerShape(20.dp)),
-        shape = RoundedCornerShape(20.dp),
+            .background(Color.Transparent, shape = RoundedCornerShape(10)),
+        shape = RoundedCornerShape(10.dp),
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
@@ -159,7 +157,7 @@ fun StaggeredMovieLayout(onClick : ()-> Unit){
                 modifier = Modifier
                     .padding(10.dp)
                     .fillMaxSize()
-                    .clickable {
+                    .clickableWithoutRipple {
                         onClick()
                     }
             ) {

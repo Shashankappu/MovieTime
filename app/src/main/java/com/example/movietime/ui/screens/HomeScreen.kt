@@ -6,7 +6,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +40,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.movietime.R
+import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.ui.theme.orange
 import com.example.movietime.utils.MoviesData
 import com.example.movietime.viewmodels.MainViewModel
@@ -105,7 +105,7 @@ fun NowPlayingMovieCard(onClick:()->Unit){
             .padding(horizontal = 20.dp)
             .size(350.dp, 205.dp)
             .clip(shape = RoundedCornerShape(12))
-            .clickable { onClick() }
+            .clickableWithoutRipple { onClick() }
     ) {
         Image(
             modifier = Modifier.fillMaxSize(),
@@ -175,7 +175,7 @@ fun TrendingMovieCard(
                 scaleX = scale
                 scaleY = scale
             }
-            .clickable {
+            .clickableWithoutRipple {
                 onClick()
             }
             .clip(shape = RoundedCornerShape(12)),
