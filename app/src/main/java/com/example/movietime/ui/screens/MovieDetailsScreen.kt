@@ -3,7 +3,6 @@ package com.example.movietime.ui.screens
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -54,12 +53,13 @@ import com.example.movietime.model.Movie
 import com.example.movietime.ui.theme.orange
 import com.example.movietime.utils.dummyMovies
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MovieDetailsScreen(movie:Movie,onBackPressed : ()-> Unit){
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState())
     ) {
-        CurrentMovieImage()
+        CurrentMovieImage(movie)
         MovieDetails(movie)
     }
     Box(
@@ -77,6 +77,7 @@ fun MovieDetailsScreen(movie:Movie,onBackPressed : ()-> Unit){
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MovieDetails(movie: Movie){
     Column {
@@ -306,15 +307,25 @@ fun ReadMoreText(synopsis:String=summarySample){
     }
 }
 @Composable
-fun CurrentMovieImage(){
+fun CurrentMovieImage(movie: Movie){
     Box{
-        Image(
-            painter = painterResource(id = R.drawable.movie_star_wars),
-            contentDescription = "image",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(290.dp),
-            contentScale = ContentScale.FillBounds
+//        Image(
+//            painter = painterResource(id = R.drawable.movie_star_wars),
+//            contentDescription = "image",
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(290.dp),
+//            contentScale = ContentScale.FillBounds
+//        )
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(movie.imageUrl)
+                .crossfade(true)
+                .build(),
+            placeholder = painterResource(R.drawable.godfather),
+            contentDescription = stringResource(R.string.app_name),
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.fillMaxWidth().height(290.dp),
         )
         Box(
             modifier = Modifier
