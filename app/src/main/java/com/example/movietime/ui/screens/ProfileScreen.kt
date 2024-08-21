@@ -1,5 +1,7 @@
 package com.example.movietime.ui.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,29 +31,45 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.model.Genre
 import com.example.movietime.model.Movie
 import com.example.movietime.ui.theme.orange
+import com.example.movietime.utils.dummyMovies
+import java.time.LocalDate
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProfileScreen() {
     val movie = Movie(
-        1,"Star wars: The Last Jedi",
-        9.5,123,
-        "Somewhat a story",120,
-        2016,
-        listOf(
-            Genre(1,"Family"),
-            Genre(2,"Drama"),
-            Genre(3,"Action"),
-            Genre(4,"Horror")
-        )
+        id = 1,
+        title = "Star Wars: The Last Jedi",
+        rating = 9.5,
+        voteCount = 123,
+        summary = "Somewhat a story",
+        runtime = 120,
+        yearOfRelease = 2016,
+        genres = listOf(
+            Genre(1, "Family"),
+            Genre(2, "Drama"),
+            Genre(3, "Action"),
+            Genre(4, "Horror")
+        ),
+        adult = false, // Assuming it's not an adult movie
+        imageUrl = "https://example.com/last_jedi.jpg",
+        releaseDate = LocalDate.of(2016, 12, 15),
+        tagline = "The Saga Continues",
+        trailerUrl = "https://example.com/last_jedi-trailer.mp4"
+
     )
     Column(
         modifier = Modifier
@@ -185,6 +203,7 @@ fun ProfileScreen() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun WatchedMoviesCarousel(onClick:()->Unit = {}){
     LazyRow(
@@ -192,8 +211,8 @@ fun WatchedMoviesCarousel(onClick:()->Unit = {}){
             .padding(top = 10.dp, start = 5.dp, end = 20.dp)
             .fillMaxWidth()
     ) {
-        items(moviesData.size) { index->
-            val movie = moviesData[index]
+        items(dummyMovies.size) { index->
+            val movie = dummyMovies[index]
             Column(
                 modifier = Modifier
                     .wrapContentSize()
@@ -204,14 +223,27 @@ fun WatchedMoviesCarousel(onClick:()->Unit = {}){
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.Start
             ) {
-                Image(
-                    painter = painterResource(id = movie.image),
-                    contentDescription = "movie image",
+//                Image(
+//                    painter = painterResource(id = movie.image),
+//                    contentDescription = "movie image",
+//                    modifier = Modifier
+//                        .clip(RoundedCornerShape(16))
+//                        .height(110.dp)
+//                        .width(150.dp),
+//                    contentScale = ContentScale.FillBounds
+//                )
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(movie.imageUrl)
+                        .crossfade(true)
+                        .build(),
+                    placeholder = painterResource(R.drawable.godfather),
+                    contentDescription = stringResource(R.string.app_name),
+                    contentScale = ContentScale.FillBounds,
                     modifier = Modifier
                         .clip(RoundedCornerShape(16))
                         .height(110.dp)
                         .width(150.dp),
-                    contentScale = ContentScale.FillBounds
                 )
                 Text(
                     text = "${movie.title}\n(${movie.yearOfRelease})",

@@ -1,9 +1,10 @@
 package com.example.movietime.ui.screens
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -32,21 +33,27 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
+import com.example.movietime.model.Movie
 import com.example.movietime.ui.theme.orange
-import com.example.movietime.utils.MoviesData
+import com.example.movietime.utils.dummyMovies
 import com.example.movietime.viewmodels.MainViewModel
 import org.koin.androidx.compose.koinViewModel
 
 private  val TAG = "HomeScreen"
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(onClick: () -> Unit) {
     val mainViewModel: MainViewModel = koinViewModel()
@@ -107,11 +114,15 @@ fun NowPlayingMovieCard(onClick:()->Unit){
             .clip(shape = RoundedCornerShape(12))
             .clickableWithoutRipple { onClick() }
     ) {
-        Image(
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data("https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2059&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
+                .crossfade(true)
+                .build(),
+            placeholder = painterResource(R.drawable.godfather),
+            contentDescription = stringResource(R.string.app_name),
+            contentScale = ContentScale.FillBounds,
             modifier = Modifier.fillMaxSize(),
-            painter = painterResource(id= R.drawable.movie_sample_image),
-            contentDescription = "image",
-            contentScale = ContentScale.FillBounds
         )
         Box(
             modifier = Modifier
@@ -161,7 +172,7 @@ fun NowPlayingMovieCard(onClick:()->Unit){
 
 @Composable
 fun TrendingMovieCard(
-    movieData : MoviesData,
+    movieData : Movie,
     alpha: Float = 1f,
     scale: Float = 1f,
     onClick : () -> Unit = {}
@@ -181,11 +192,15 @@ fun TrendingMovieCard(
             .clip(shape = RoundedCornerShape(12)),
         contentAlignment = Alignment.Center
     ) {
-        Image(
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(movieData.imageUrl)
+                .crossfade(true)
+                .build(),
+            placeholder = painterResource(R.drawable.godfather),
+            contentDescription = stringResource(R.string.app_name),
+            contentScale = ContentScale.FillBounds,
             modifier = Modifier.fillMaxSize(),
-            painter = painterResource(id = movieData.image),
-            contentDescription = "image",
-            contentScale = ContentScale.Crop
         )
         Box(
             modifier = Modifier
@@ -275,21 +290,22 @@ fun TrendingMovieCard(
     }
 }
 
-val moviesData = listOf(
-    MoviesData("The God father",R.drawable.godfather,8.5f,1983),
-    MoviesData("Star Wars",R.drawable.movie_star_wars,7.0f,2010),
-    MoviesData("The Mongol",R.drawable.mongol2,6.0f,2001),
-    MoviesData("Thor",R.drawable.thor,8.0f,2019),
-    MoviesData("Avatar",R.drawable.avatar,6.0f,2016),
-    MoviesData("Fire",R.drawable.fire,9.0f,2000)
-)
+//val moviesData = listOf(
+//    MoviesData("The God father",R.drawable.godfather,8.5f,1983),
+//    MoviesData("Star Wars",R.drawable.movie_star_wars,7.0f,2010),
+//    MoviesData("The Mongol",R.drawable.mongol2,6.0f,2001),
+//    MoviesData("Thor",R.drawable.thor,8.0f,2019),
+//    MoviesData("Avatar",R.drawable.avatar,6.0f,2016),
+//    MoviesData("Fire",R.drawable.fire,9.0f,2000)
+//)
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TrendingCarousel() {
     Box(modifier = Modifier.fillMaxSize()) {
-        val pagerState = rememberPagerState(initialPage = 1, pageCount = { moviesData.size })
+        val pagerState = rememberPagerState(initialPage = 1, pageCount = { dummyMovies.size })
         HorizontalPager(
             state = pagerState,
             contentPadding= PaddingValues(horizontal = 50.dp, vertical = 5.dp),
@@ -297,7 +313,7 @@ fun TrendingCarousel() {
         ) { index ->
             val scale = if(pagerState.currentPage == index) 1.05f else 0.85f
             val alpha = if(pagerState.currentPage == index) 1f else 0.85f
-            TrendingMovieCard(moviesData[index],scale = scale, alpha = alpha)
+            TrendingMovieCard(dummyMovies[index],scale = scale, alpha = alpha)
         }
     }
 }
