@@ -1,6 +1,5 @@
 package com.example.movietime.ui.screens
 
-import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -85,16 +84,13 @@ fun HomeScreen(onClick: () -> Unit) {
         )
         NowPlayingMovieCard(onClick)
         Text(
-            "Trending",
+            "Top Rated",
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 20.dp),
             fontSize = 24.sp
         )
-        TrendingCarousel(topRatedMoviesList)
+        TopRatedCarousel(topRatedMoviesList)
     }
-    //ListView(mainViewModel)
 }
-
-
 
 @Composable
 fun NowPlayingMovieCard(onClick:()->Unit){
@@ -164,7 +160,7 @@ fun NowPlayingMovieCard(onClick:()->Unit){
 }
 
 @Composable
-fun TrendingMovieCard(
+fun TopRatedMovieCard(
     movieData : Movie,
     alpha: Float = 1f,
     scale: Float = 1f,
@@ -284,11 +280,9 @@ fun TrendingMovieCard(
 }
 
 
-@RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TrendingCarousel(topRatedMoviesList:List<Movie>) {
+fun TopRatedCarousel(topRatedMoviesList:List<Movie>) {
     Box(modifier = Modifier.fillMaxSize()) {
         if(topRatedMoviesList.isNotEmpty()) {
             val pagerState = rememberPagerState(initialPage = 1,pageCount = { topRatedMoviesList.size })
@@ -299,7 +293,7 @@ fun TrendingCarousel(topRatedMoviesList:List<Movie>) {
             ) { index ->
                 val scale = if (pagerState.currentPage == index) 1.05f else 0.85f
                 val alpha = if (pagerState.currentPage == index) 1f else 0.85f
-                TrendingMovieCard(topRatedMoviesList[index], scale = scale, alpha = alpha)
+                TopRatedMovieCard(topRatedMoviesList[index], scale = scale, alpha = alpha)
             }
         }
     }
