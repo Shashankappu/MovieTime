@@ -186,7 +186,7 @@ fun ProfileScreen() {
             }
         }
         Text(
-            text = "Watched Movies :",
+            text = "Saved Movies:",
             color = Color.White,
             modifier = Modifier
                 .padding(start = 10.dp, top = 20.dp)
@@ -197,7 +197,21 @@ fun ProfileScreen() {
             modifier = Modifier.padding(top = 10.dp)
         ){
             WatchedMoviesCarousel()
+            Text(
+                text = "Recommended Movies :",
+                color = Color.White,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                fontSize = 24.sp
+            )
             WatchedMoviesCarousel()
+            Text(
+                text = "Your Favourites:",
+                color = Color.White,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                fontSize = 24.sp
+            )
             WatchedMoviesCarousel()
         }
     }
