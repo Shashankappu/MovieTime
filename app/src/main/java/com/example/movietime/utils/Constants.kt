@@ -1,7 +1,5 @@
 package com.example.movietime.utils
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.example.movietime.R
 import com.example.movietime.model.Genre
 import com.example.movietime.model.Movie
@@ -26,7 +24,6 @@ object Constants {
     )
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 val dummyMovies = listOf(
     Movie(
         id = 1,

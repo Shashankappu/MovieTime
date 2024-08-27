@@ -2,7 +2,6 @@ package com.example.movietime.ui.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -56,11 +55,9 @@ import com.example.movietime.utils.dummyMovies
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SearchScreen(onClick: () -> Unit) {
-    // Column Composable,
     Column(
         modifier = Modifier
             .fillMaxSize(),
-        // parameters set to place the items in center
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top
     ) {
@@ -100,7 +97,7 @@ fun SearchBox(){
         textStyle = TextStyle(textAlign = TextAlign.Left, fontSize = 16.sp),
         modifier = Modifier
             .padding(start = 20.dp, bottom = 15.dp)
-            .size(328.dp, 48.dp)
+            .size(328.dp, 50.dp)
             .background(Color.Transparent, shape = RoundedCornerShape(10)),
         shape = RoundedCornerShape(10.dp),
         colors = TextFieldDefaults.colors(

@@ -238,15 +238,6 @@ fun RelatedMoviesCarousel(onClick:()->Unit = {}){
                         onClick()
                     }
             ) {
-//                Image(
-//                    painter = painterResource(id = movie.image),
-//                    contentDescription = "movie image",
-//                    modifier = Modifier
-//                        .clip(RoundedCornerShape(16))
-//                        .height(110.dp)
-//                        .width(150.dp),
-//                    contentScale = ContentScale.FillBounds
-//                )
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(movie.imageUrl)
