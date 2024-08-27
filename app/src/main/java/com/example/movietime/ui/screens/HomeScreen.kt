@@ -2,6 +2,7 @@ package com.example.movietime.ui.screens
 
 import android.annotation.SuppressLint
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -25,6 +26,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -48,7 +51,6 @@ import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.model.Movie
 import com.example.movietime.ui.theme.orange
-import com.example.movietime.utils.dummyMovies
 import com.example.movietime.viewmodels.MainViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -57,6 +59,8 @@ private  val TAG = "HomeScreen"
 @Composable
 fun HomeScreen(onClick: () -> Unit) {
     val mainViewModel: MainViewModel = koinViewModel()
+    val moviesList by mainViewModel.moviesList.collectAsState()
+    val topRatedMoviesList by mainViewModel.topRatedMoviesList.collectAsState()
     val appNametext = buildAnnotatedString {
         withStyle(style = SpanStyle(color = orange)) {
             append("MoovY")
@@ -66,7 +70,10 @@ fun HomeScreen(onClick: () -> Unit) {
         }
     }
     LaunchedEffect(Unit) {
-        mainViewModel.fetchMovies()
+        if(moviesList.isEmpty()) mainViewModel.fetchMovies()
+        if(topRatedMoviesList.isEmpty()) mainViewModel.fetchTopRatedMovies()
+        Log.d("Shashank", moviesList.toString())
+        Log.d("Shashank", topRatedMoviesList.toString())
     }
     Column(
         modifier = Modifier.fillMaxSize()
@@ -82,28 +89,12 @@ fun HomeScreen(onClick: () -> Unit) {
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 20.dp),
             fontSize = 24.sp
         )
-        TrendingCarousel()
+        TrendingCarousel(topRatedMoviesList)
     }
     //ListView(mainViewModel)
 }
 
-//@Composable
-//fun ListView(mainViewModel: MainViewModel){
-//    val moviesList = mainViewModel.moviesList.observeAsState(emptyList()).value
-//    LazyColumn(
-//        modifier = Modifier
-//            .padding(top = 150.dp,start = 10.dp, end = 10.dp, bottom = 10.dp)
-//    ) {
-//        itemsIndexed(moviesList){ _,item ->
-//            Text(item.title,
-//                modifier = Modifier
-//                    .fillMaxSize(),
-//                fontSize = 20.sp,
-//                color = Color.Red
-//            )
-//        }
-//    }
-//}
+
 
 @Composable
 fun NowPlayingMovieCard(onClick:()->Unit){
@@ -128,13 +119,15 @@ fun NowPlayingMovieCard(onClick:()->Unit){
             modifier = Modifier
                 .size(230.dp, 70.dp)
                 .padding(start = 10.dp, bottom = 10.dp)
-                .background(Brush.linearGradient(
-                    colors = listOf(
-                        Color(0xFFDADADA).copy(alpha=0.4f),
-                        Color(0xFFDADADA).copy(alpha=0.4f)
-                    )
-                ),shape = RoundedCornerShape(30))
-                .border(BorderStroke(2.dp,Color.Gray.copy(0.4f)),RoundedCornerShape(30))
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(
+                            Color(0xFFDADADA).copy(alpha = 0.4f),
+                            Color(0xFFDADADA).copy(alpha = 0.4f)
+                        )
+                    ),shape = RoundedCornerShape(30)
+                )
+                .border(BorderStroke(2.dp, Color.Gray.copy(0.4f)), RoundedCornerShape(30))
                 .align(Alignment.BottomStart)
         ) {
             Row(
@@ -215,7 +208,7 @@ fun TrendingMovieCard(
                     ),
                     shape = RoundedCornerShape(30)
                 )
-                .border(BorderStroke(2.dp,Color.Gray.copy(0.4f)),RoundedCornerShape(30))
+                .border(BorderStroke(2.dp, Color.Gray.copy(0.4f)), RoundedCornerShape(30))
                 .align(Alignment.BottomCenter),
             contentAlignment = Alignment.Center
         ) {
@@ -239,7 +232,7 @@ fun TrendingMovieCard(
                     ),
                     shape = RoundedCornerShape(30)
                 )
-                .border(BorderStroke(2.dp,Color.Gray.copy(0.4f)),RoundedCornerShape(30))
+                .border(BorderStroke(2.dp, Color.Gray.copy(0.4f)), RoundedCornerShape(30))
                 .align(Alignment.TopEnd),
             contentAlignment = Alignment.Center
         ) {
@@ -277,7 +270,7 @@ fun TrendingMovieCard(
                 }
                 Spacer(modifier = Modifier.width(5.dp))
                 Text(
-                    text = movieData.rating.toString(),
+                    text = "${movieData.voteAverage}",
                     fontSize = 16.sp,
                     color = Color.White,
                     modifier = Modifier
@@ -290,30 +283,24 @@ fun TrendingMovieCard(
     }
 }
 
-//val moviesData = listOf(
-//    MoviesData("The God father",R.drawable.godfather,8.5f,1983),
-//    MoviesData("Star Wars",R.drawable.movie_star_wars,7.0f,2010),
-//    MoviesData("The Mongol",R.drawable.mongol2,6.0f,2001),
-//    MoviesData("Thor",R.drawable.thor,8.0f,2019),
-//    MoviesData("Avatar",R.drawable.avatar,6.0f,2016),
-//    MoviesData("Fire",R.drawable.fire,9.0f,2000)
-//)
 
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TrendingCarousel() {
+fun TrendingCarousel(topRatedMoviesList:List<Movie>) {
     Box(modifier = Modifier.fillMaxSize()) {
-        val pagerState = rememberPagerState(initialPage = 1, pageCount = { dummyMovies.size })
-        HorizontalPager(
-            state = pagerState,
-            contentPadding= PaddingValues(horizontal = 50.dp, vertical = 5.dp),
-            modifier = Modifier.fillMaxSize(),
-        ) { index ->
-            val scale = if(pagerState.currentPage == index) 1.05f else 0.85f
-            val alpha = if(pagerState.currentPage == index) 1f else 0.85f
-            TrendingMovieCard(dummyMovies[index],scale = scale, alpha = alpha)
+        if(topRatedMoviesList.isNotEmpty()) {
+            val pagerState = rememberPagerState(initialPage = 1,pageCount = { topRatedMoviesList.size })
+            HorizontalPager(
+                state = pagerState,
+                contentPadding = PaddingValues(horizontal = 50.dp, vertical = 5.dp),
+                modifier = Modifier.fillMaxSize(),
+            ) { index ->
+                val scale = if (pagerState.currentPage == index) 1.05f else 0.85f
+                val alpha = if (pagerState.currentPage == index) 1f else 0.85f
+                TrendingMovieCard(topRatedMoviesList[index], scale = scale, alpha = alpha)
+            }
         }
     }
 }

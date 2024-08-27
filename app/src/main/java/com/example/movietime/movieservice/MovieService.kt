@@ -9,4 +9,6 @@ interface MovieService {
     @GET("movies")
     suspend fun getMovies() : List<Movie>
 
+    @GET("movies/top-rated")
+    suspend fun getTopRatedMovies() : List<Movie>
 }

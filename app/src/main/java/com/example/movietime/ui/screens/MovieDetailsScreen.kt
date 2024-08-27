@@ -116,7 +116,7 @@ fun MovieDetails(movie: Movie){
                     .padding(2.dp)
             )
             Text(
-                text = "${movie.rating} minutes",
+                text = "${movie.voteAverage} minutes",
                 modifier = Modifier,
                 fontSize = 12.sp,
                 color = Color.Gray
@@ -309,14 +309,6 @@ fun ReadMoreText(synopsis:String=summarySample){
 @Composable
 fun CurrentMovieImage(movie: Movie){
     Box{
-//        Image(
-//            painter = painterResource(id = R.drawable.movie_star_wars),
-//            contentDescription = "image",
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(290.dp),
-//            contentScale = ContentScale.FillBounds
-//        )
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(movie.imageUrl)

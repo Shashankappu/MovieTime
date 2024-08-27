@@ -53,7 +53,7 @@ fun ProfileScreen() {
     val movie = Movie(
         id = 1,
         title = "Star Wars: The Last Jedi",
-        rating = 9.5,
+        voteAverage = 9.5,
         voteCount = 123,
         summary = "Somewhat a story",
         runtime = 120,
@@ -66,7 +66,7 @@ fun ProfileScreen() {
         ),
         adult = false, // Assuming it's not an adult movie
         imageUrl = "https://example.com/last_jedi.jpg",
-        releaseDate = LocalDate.of(2016, 12, 15),
+        releaseDate = LocalDate.of(2016, 12, 15).toString(),
         tagline = "The Saga Continues",
         trailerUrl = "https://example.com/last_jedi-trailer.mp4"
 
@@ -223,15 +223,6 @@ fun WatchedMoviesCarousel(onClick:()->Unit = {}){
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.Start
             ) {
-//                Image(
-//                    painter = painterResource(id = movie.image),
-//                    contentDescription = "movie image",
-//                    modifier = Modifier
-//                        .clip(RoundedCornerShape(16))
-//                        .height(110.dp)
-//                        .width(150.dp),
-//                    contentScale = ContentScale.FillBounds
-//                )
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(movie.imageUrl)
