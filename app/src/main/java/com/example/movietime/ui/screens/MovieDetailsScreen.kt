@@ -81,12 +81,29 @@ fun MovieDetailsScreen(movie:Movie,onBackPressed : ()-> Unit){
 @Composable
 fun MovieDetails(movie: Movie){
     Column {
-        Text(
-            text = movie.title,
-            modifier = Modifier.padding(top = 12.dp, start = 20.dp),
-            fontSize = 24.sp,
-            color = Color.White
-        )
+        var isBookmarked by remember { mutableStateOf(false) }
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text(
+                text = movie.title,
+                modifier = Modifier.padding(top = 12.dp, start = 20.dp),
+                fontSize = 24.sp,
+                color = Color.White
+            )
+            Icon(
+                painter = painterResource(id = if(isBookmarked) R.drawable.bookmark_done else R.drawable.bookmark),
+                modifier = Modifier
+                    .size(40.dp)
+                    .padding(start = 10.dp,top = 15.dp)
+                    .clickableWithoutRipple {
+                        isBookmarked = !isBookmarked
+                    },
+                contentDescription = "runtime",
+                tint = Color.Unspecified
+            )
+        }
         Row(
             modifier = Modifier
                 .size(220.dp, 24.dp)
@@ -308,7 +325,9 @@ fun CurrentMovieImage(movie: Movie){
             placeholder = painterResource(R.drawable.godfather),
             contentDescription = stringResource(R.string.app_name),
             contentScale = ContentScale.FillBounds,
-            modifier = Modifier.fillMaxWidth().height(290.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(290.dp),
         )
         Box(
             modifier = Modifier
