@@ -1,6 +1,7 @@
 package com.example.movietime.ui.screens
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -50,11 +53,13 @@ import coil.request.ImageRequest
 import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.ui.theme.orange
-import com.example.movietime.utils.dummyMovies
+import com.example.movietime.viewmodels.MainViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SearchScreen(onClick: () -> Unit) {
+    val mainViewModel : MainViewModel = koinViewModel()
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -71,8 +76,8 @@ fun SearchScreen(onClick: () -> Unit) {
                 .size(283.dp, 72.dp)
         )
         SearchBox()
-        GenreRecommendationTabLayout()
-        StaggeredMovieLayout(onClick)
+        GenreRecommendationTabLayout(mainViewModel)
+        StaggeredMovieLayout(mainViewModel,onClick)
     }
 }
 
@@ -109,11 +114,17 @@ fun SearchBox(){
 }
 
 @Composable
-fun GenreRecommendationTabLayout(){
-    var selectedTabIndex by remember {
-        mutableIntStateOf(0)
+fun GenreRecommendationTabLayout(mainViewModel:MainViewModel){
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val moviesByGenreList by mainViewModel.moviesList.collectAsState()
+
+    val tabTitles = listOf("Action","Sci-Fi", "Adventure","Drama")
+    LaunchedEffect(Unit) {
+        if (moviesByGenreList.isEmpty()) {
+            mainViewModel.fetchMoviesByGenre("Action")
+        }
     }
-    val tabTitles = listOf("Family","Comedy", "Adventure","Drama")
+
     ScrollableTabRow(
         selectedTabIndex = selectedTabIndex,
         modifier = Modifier
@@ -138,7 +149,10 @@ fun GenreRecommendationTabLayout(){
         tabTitles.forEachIndexed { index, title ->
             Tab(
                 selected = selectedTabIndex == index,
-                onClick = { selectedTabIndex = index },
+                onClick = {
+                    selectedTabIndex = index
+                    mainViewModel.fetchMoviesByGenre(tabTitles[selectedTabIndex])
+                },
                 text = {
                     Text(
                         text = title,
@@ -153,13 +167,15 @@ fun GenreRecommendationTabLayout(){
 }
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun StaggeredMovieLayout(onClick : ()-> Unit){
+fun StaggeredMovieLayout(mainViewModel:MainViewModel,onClick : ()-> Unit){
+    val moviesByGenreList by mainViewModel.moviesByGenreList.collectAsState()
+    Log.d("Shashank","moviesByGenreList: $moviesByGenreList")
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
         modifier = Modifier.fillMaxSize()
     ) {
-        items(dummyMovies.size) { index->
-            val movie = dummyMovies[index]
+        items(moviesByGenreList.size) { index->
+            val movie = moviesByGenreList[index]
             Column(
                 modifier = Modifier
                     .padding(10.dp)
@@ -169,15 +185,6 @@ fun StaggeredMovieLayout(onClick : ()-> Unit){
                     }
             ) {
                 val height = if(index%2==0) 184.dp else 160.dp
-//                Image(
-//                    painter = painterResource(id = movie.image),
-//                    contentDescription = "movie image",
-//                    modifier = Modifier
-//                        .clip(RoundedCornerShape(20))
-//                        .height(height)
-//                        .width(154.dp),
-//                    contentScale = ContentScale.Crop
-//                )
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(movie.imageUrl)
@@ -191,7 +198,7 @@ fun StaggeredMovieLayout(onClick : ()-> Unit){
                         .height(height)
                         .width(154.dp),
                 )
-                Text(text = "${movie.title} (${movie.yearOfRelease})", modifier = Modifier.padding(top = 12.dp))
+                Text(text = "${movie.title} (${movie.releaseDate})", modifier = Modifier.padding(top = 12.dp))
             }
         }
     }
