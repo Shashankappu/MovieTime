@@ -12,8 +12,10 @@ class MainViewModel(private val movieService: MovieService) : ViewModel(){
     private val TAG:String = "MainViewModel"
     private val _moviesList = MutableStateFlow<List<Movie>>(emptyList())
     private val _topRatedMoviesList = MutableStateFlow<List<Movie>>(emptyList())
+    private val _moviesByGenreList = MutableStateFlow<List<Movie>>(emptyList())
     val moviesList: MutableStateFlow<List<Movie>> get() = _moviesList
     val topRatedMoviesList: MutableStateFlow<List<Movie>> get() = _topRatedMoviesList
+    val moviesByGenreList : MutableStateFlow<List<Movie>> get() = _moviesByGenreList
 
     fun fetchTopRatedMovies() {
         viewModelScope.launch {
@@ -34,6 +36,17 @@ class MainViewModel(private val movieService: MovieService) : ViewModel(){
                 _moviesList.value = movies
             } catch (e: Exception) {
                 // Handle the error
+                Log.d(TAG,"$e")
+            }
+        }
+    }
+
+    fun fetchMoviesByGenre(genreName : String) {
+        viewModelScope.launch {
+            try {
+                val movies = movieService.getMovieByGenre(genreName)
+                moviesByGenreList.value = movies
+            } catch (e: Exception) {
                 Log.d(TAG,"$e")
             }
         }

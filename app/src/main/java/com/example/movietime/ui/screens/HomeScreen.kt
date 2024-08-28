@@ -71,8 +71,8 @@ fun HomeScreen(onClick: () -> Unit) {
     LaunchedEffect(Unit) {
         if(moviesList.isEmpty()) mainViewModel.fetchMovies()
         if(topRatedMoviesList.isEmpty()) mainViewModel.fetchTopRatedMovies()
-        Log.d("Shashank", moviesList.toString())
-        Log.d("Shashank", topRatedMoviesList.toString())
+        Log.d("Shashank","moviesList: $moviesList")
+        Log.d("Shashank","topRatedMoviesList: $topRatedMoviesList")
     }
     Column(
         modifier = Modifier.fillMaxSize()
