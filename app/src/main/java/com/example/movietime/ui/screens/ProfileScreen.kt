@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,16 +21,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,25 +32,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.model.Genre
 import com.example.movietime.model.Movie
-import com.example.movietime.ui.theme.orange
 import com.example.movietime.utils.dummyMovies
 import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ProfileScreen() {
-    var popUpState by remember { mutableStateOf(false) }
+fun ProfileScreen(onEditProfileClicked:()->Unit) {
     val movie = Movie(
         id = 1,
         title = "Star Wars: The Last Jedi",
@@ -84,7 +72,7 @@ fun ProfileScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 10.dp)
+            .padding(10.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top,
@@ -94,42 +82,18 @@ fun ProfileScreen() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            Row(
+            Image(
+                painter = painterResource(id = R.drawable.avatar),
+                contentDescription = "Profile image",
                 modifier = Modifier
-                    .padding(top = 20.dp),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.spacedBy((-35).dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.avatar),
-                    contentDescription = "profile image",
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(RoundedCornerShape(50))
-                        .border(
-                            border = BorderStroke(2.dp, Color.Gray.copy(0.4f)),
-                            shape = RoundedCornerShape(50)
-                        ),
-                    contentScale = ContentScale.FillBounds
-                )
-                Image(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "edit profile",
-                    modifier = Modifier
-                        .size(35.dp)
-                        .clip(RoundedCornerShape(50))
-                        .border(
-                            border = BorderStroke(2.dp, Color.Gray.copy(0.4f)),
-                            shape = RoundedCornerShape(50)
-                        )
-                        .background(orange)
-                        .clickableWithoutRipple {
-                            popUpState = !popUpState
-                        }
-                    ,
-                    contentScale = ContentScale.Inside
-                )
-            }
+                    .size(120.dp)
+                    .clip(RoundedCornerShape(50))
+                    .border(
+                        border = BorderStroke(2.dp, Color.Gray.copy(0.4f)),
+                        shape = RoundedCornerShape(50)
+                    ),
+                contentScale = ContentScale.FillBounds
+            )
             Column(
                 modifier = Modifier
                     .padding(start = 10.dp)
@@ -154,6 +118,20 @@ fun ProfileScreen() {
                     fontSize = 16.sp,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
+                )
+                Text(
+                    text = "Edit profile",
+                    color = Color.White,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickableWithoutRipple {
+                            onEditProfileClicked()
+                        }
+                        .align(Alignment.CenterHorizontally),
+                    fontSize = 14.sp,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    textDecoration = TextDecoration.Underline
                 )
             }
         }
@@ -199,17 +177,16 @@ fun ProfileScreen() {
                 }
             }
         }
-        Text(
-            text = "Saved Movies:",
-            color = Color.White,
-            modifier = Modifier
-                .padding(start = 10.dp, top = 20.dp)
-                .fillMaxWidth(),
-            fontSize = 24.sp
-        )
         Column(
             modifier = Modifier.padding(top = 10.dp)
         ){
+            Text(
+                text = "Saved Movies:",
+                color = Color.White,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                fontSize = 24.sp
+            )
             WatchedMoviesCarousel()
             Text(
                 text = "Recommended Movies :",
@@ -227,92 +204,6 @@ fun ProfileScreen() {
                 fontSize = 24.sp
             )
             WatchedMoviesCarousel()
-        }
-        if(popUpState) {
-            Popup(
-                alignment = Alignment.BottomCenter,
-                onDismissRequest = {
-                    popUpState = !popUpState
-                }
-            ) {
-                UserForm{ email,lastname,firstname,username ->
-                    saveData(email,lastname,firstname,username)
-                }
-            }
-        }
-    }
-
-}
-private fun saveData(email: String,lastname:String,firstname:String,username:String){
-
-}
-@Composable
-fun UserForm(
-    onFormSubmit: (String, String, String, String) -> Unit
-) {
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .wrapContentSize()
-            .background(Color.DarkGray, shape = RoundedCornerShape(12.dp,12.dp))
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Edit Profile",
-            fontSize = 20.sp
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = firstName,
-            onValueChange = { firstName = it },
-            label = { Text("First Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = lastName,
-            onValueChange = { lastName = it },
-            label = { Text("Last Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Username") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                onFormSubmit(firstName, lastName, email,username)
-            },
-            modifier = Modifier.align(Alignment.End)
-        ) {
-            Text("Submit")
         }
     }
 }

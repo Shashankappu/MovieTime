@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.movietime.ui.screens.EditProfileScreen
 import com.example.movietime.ui.screens.HomeScreen
 import com.example.movietime.ui.screens.MovieDetailsScreen
 import com.example.movietime.ui.screens.ProfileScreen
@@ -40,13 +41,21 @@ fun NavHostContainer(
 
             // route : profile
             composable("profile") {
-                ProfileScreen()
+                ProfileScreen{
+                    navController.navigate("edit_profile")
+                }
             }
 
             //route : details
             composable("details"){
                 val movie = dummyMovies[0]
                 MovieDetailsScreen(movie){
+                    navController.navigateUp()
+                }
+            }
+
+            composable("edit_profile"){
+                EditProfileScreen {
                     navController.navigateUp()
                 }
             }
