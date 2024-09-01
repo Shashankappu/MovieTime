@@ -31,7 +31,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -75,18 +74,18 @@ fun SearchScreen(onClick: () -> Unit) {
                 .padding(top = 20.dp, start = 24.dp)
                 .size(283.dp, 72.dp)
         )
-        SearchBox()
+        SearchBox(mainViewModel)
         GenreRecommendationTabLayout(mainViewModel)
         StaggeredMovieLayout(mainViewModel,onClick)
     }
 }
 
 @Composable
-fun SearchBox(){
-    var query by remember { mutableStateOf("") }
+fun SearchBox(mainViewModel: MainViewModel){
+    val query by mainViewModel.getQuery().collectAsState()
     TextField(
         value = query,
-        onValueChange = { query = it },
+        onValueChange = { mainViewModel.setQuery(it) },
         placeholder = { Text(text = "Search", color = Color.Gray, fontSize = 16.sp) },
         leadingIcon = {
             Icon(
@@ -116,12 +115,12 @@ fun SearchBox(){
 @Composable
 fun GenreRecommendationTabLayout(mainViewModel:MainViewModel){
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val moviesByGenreList by mainViewModel.moviesList.collectAsState()
-
-    val tabTitles = listOf("Action","Sci-Fi", "Adventure","Drama")
+    val moviesList by mainViewModel.searchedMoviesList.collectAsState()
+    val query by mainViewModel.getQuery().collectAsState()
+    val tabTitles = listOf("All","Action","Sci-Fi", "Adventure","Drama")
     LaunchedEffect(Unit) {
-        if (moviesByGenreList.isEmpty()) {
-            mainViewModel.fetchMoviesByGenre("Action")
+        if (moviesList.isEmpty()) {
+            mainViewModel.fetchMoviesBySearchQuery("")
         }
     }
 
@@ -151,7 +150,7 @@ fun GenreRecommendationTabLayout(mainViewModel:MainViewModel){
                 selected = selectedTabIndex == index,
                 onClick = {
                     selectedTabIndex = index
-                    mainViewModel.fetchMoviesByGenre(tabTitles[selectedTabIndex])
+                    mainViewModel.fetchMoviesBySearchQuery(query)
                 },
                 text = {
                     Text(
@@ -168,14 +167,14 @@ fun GenreRecommendationTabLayout(mainViewModel:MainViewModel){
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun StaggeredMovieLayout(mainViewModel:MainViewModel,onClick : ()-> Unit){
-    val moviesByGenreList by mainViewModel.moviesByGenreList.collectAsState()
-    Log.d("Shashank","moviesByGenreList: $moviesByGenreList")
+    val moviesList by mainViewModel.searchedMoviesList.collectAsState()
+    Log.d("Shashank","moviesByGenreList: $moviesList")
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
         modifier = Modifier.fillMaxSize()
     ) {
-        items(moviesByGenreList.size) { index->
-            val movie = moviesByGenreList[index]
+        items(moviesList.size) { index->
+            val movie = moviesList[index]
             Column(
                 modifier = Modifier
                     .padding(10.dp)

@@ -54,6 +54,9 @@ import org.koin.androidx.compose.koinViewModel
 fun ProfileScreen(onEditProfileClicked:()->Unit) {
     val profileViewModel: ProfileViewModel = koinViewModel()
     val genres by profileViewModel.getFavouriteGenresList().observeAsState()
+    val imageId by profileViewModel.getProfileImageUrl().observeAsState()
+    val username by profileViewModel.getUsername().observeAsState("")
+    val userEmail by profileViewModel.getEmail().observeAsState("")
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -67,9 +70,6 @@ fun ProfileScreen(onEditProfileClicked:()->Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            val imageId by profileViewModel.getProfileImageUrl().observeAsState()
-            val username by profileViewModel.getUsername().observeAsState("")
-            val userEmail by profileViewModel.getEmail().observeAsState("")
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(imageId)
