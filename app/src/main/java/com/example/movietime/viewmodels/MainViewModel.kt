@@ -61,10 +61,10 @@ class MainViewModel(private val movieService: MovieService) : ViewModel(){
         }
     }
 
-    fun fetchMoviesBySearchQuery(query : String) {
+    fun fetchMoviesBySearchQuery(query : String,genreName:String?) {
         viewModelScope.launch {
             try {
-                val movies = movieService.getMovieBySearchQuery(query)
+                val movies = movieService.getMovieBySearchQuery(query,genreName)
                 _searchedMoviesList.value = movies
             } catch (e: Exception) {
                 Log.d(TAG,"$e")
