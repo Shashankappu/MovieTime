@@ -21,18 +21,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -41,22 +38,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.ui.theme.bgPurple
 import com.example.movietime.ui.theme.orange
-
+import com.example.movietime.viewmodels.Gender
+import com.example.movietime.viewmodels.ProfileViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EditProfileScreen(
     onSubmit:()->Unit
 ) {
+    val profileViewModel:ProfileViewModel = koinViewModel()
     Column(
         modifier = Modifier
             .padding(horizontal = 10.dp)
@@ -79,48 +83,13 @@ fun EditProfileScreen(
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Box(
-                modifier = Modifier.padding(20.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.avatar),
-                    contentDescription = "profile image",
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(RoundedCornerShape(50))
-                        .border(
-                            border = BorderStroke(2.dp, Color.Gray.copy(0.4f)),
-                            shape = RoundedCornerShape(50)
-                        ),
-                    contentScale = ContentScale.FillBounds
-                )
-                Box(
-                    modifier = Modifier.align(Alignment.BottomEnd)
-                ){
-                    Image(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "edit profile",
-                        modifier = Modifier
-                            .size(35.dp)
-                            .clip(RoundedCornerShape(50))
-                            .border(
-                                border = BorderStroke(2.dp, Color.Gray.copy(0.4f)),
-                                shape = RoundedCornerShape(50)
-                            )
-                            .background(orange)
-                            .clickableWithoutRipple {
-                            },
-                        contentScale = ContentScale.Inside
-                    )
-                }
-            }
-            CustomDropDown()
-            CustomOutlinedTextField("Username")
-            CustomOutlinedTextField("First Name")
-            CustomOutlinedTextField("Last Name")
-            CustomOutlinedTextField("Email")
+            EditProfileImage(profileViewModel)
+            CustomDropDown(profileViewModel)
+            UserNameField(profileViewModel)
+            FirstNameField(profileViewModel)
+            LastNameField(profileViewModel)
+            UserEmailField(profileViewModel)
         }
-
 
         Box(
             modifier = Modifier
@@ -138,12 +107,98 @@ fun EditProfileScreen(
 }
 
 @Composable
-fun CustomOutlinedTextField(label :String,keyboardType: KeyboardType = KeyboardType.Text){
-    var text by remember { mutableStateOf("") }
+fun UserNameField(profileViewModel: ProfileViewModel){
+    val username by profileViewModel.getUsername().observeAsState("")
+    CustomOutlinedTextField(text= username,label = "Username"){
+        profileViewModel.setUserName(it)
+    }
+}
 
+@Composable
+fun FirstNameField(profileViewModel: ProfileViewModel){
+    val firstname by profileViewModel.getFirstName().observeAsState("")
+    CustomOutlinedTextField(text= firstname,label = "Firstname"){
+        profileViewModel.setFirstName(it)
+    }
+}
+
+@Composable
+fun LastNameField(profileViewModel: ProfileViewModel){
+    val lastname by profileViewModel.getLastName().observeAsState("")
+    CustomOutlinedTextField(text= lastname,label = "Lastname"){
+        profileViewModel.setLastName(it)
+    }
+}
+
+@Composable
+fun UserEmailField(profileViewModel: ProfileViewModel){
+    val userEmail by profileViewModel.getEmail().observeAsState("")
+    CustomOutlinedTextField(text= userEmail,label = "Email"){
+        profileViewModel.setEmail(it)
+    }
+}
+
+@Composable
+fun EditProfileImage(
+    profileViewModel: ProfileViewModel,
+    onClick:() -> Unit = {}
+){
+    val imageId by profileViewModel.getProfileImageUrl().observeAsState()
+    Box(
+        modifier = Modifier.padding(20.dp)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageId)
+                .crossfade(true)
+                .build(),
+            placeholder = painterResource(R.drawable.godfather),
+            contentDescription = stringResource(R.string.app_name),
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier
+                .size(120.dp)
+                .clip(RoundedCornerShape(50))
+                .border(
+                    border = BorderStroke(2.dp, Color.Gray),
+                    shape = RoundedCornerShape(50)
+                )
+        )
+        Box(
+            modifier = Modifier.align(Alignment.BottomEnd)
+        ){
+            Image(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "edit profile",
+                modifier = Modifier
+                    .size(35.dp)
+                    .clip(RoundedCornerShape(50))
+                    .border(
+                        border = BorderStroke(2.dp, Color.Gray.copy(0.4f)),
+                        shape = RoundedCornerShape(50)
+                    )
+                    .background(orange)
+                    .clickableWithoutRipple {
+                        onClick()
+                    },
+                contentScale = ContentScale.Inside
+            )
+        }
+    }
+}
+
+@Composable
+fun CustomOutlinedTextField(
+    text :String,label :String,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    onValueChange:(String)->Unit
+){
+    var newText by remember { mutableStateOf(text) }
     OutlinedTextField(
-        value = text,
-        onValueChange = { text = it },
+        value = newText,
+        onValueChange = {
+            newText = it
+            onValueChange(it)
+        },
         label = { Text(label) },
         colors = TextFieldDefaults.colors(
             focusedLabelColor = Color.White,
@@ -166,22 +221,11 @@ fun CustomOutlinedTextField(label :String,keyboardType: KeyboardType = KeyboardT
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CustomDatePicker(label :String){
-    val datePickerState = rememberDatePickerState()
-    DatePicker(
-        state = datePickerState,
-        modifier = Modifier,
-        showModeToggle = false,
-        colors = DatePickerDefaults.colors()
-    )
-}
 
 @Composable
-fun CustomDropDown() {
+fun CustomDropDown(profileViewModel:ProfileViewModel) {
     var isExpanded by remember { mutableStateOf(false) }
-    var selectedItem by remember { mutableStateOf("Select Gender") }
+    val selectedItem by profileViewModel.getGender().observeAsState()
 
     Box(
         modifier = Modifier
@@ -205,7 +249,7 @@ fun CustomDropDown() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = selectedItem,
+                text = selectedItem.toString(),
                 color = Color.White,
                 fontSize = 16.sp
             )
@@ -227,21 +271,21 @@ fun CustomDropDown() {
             DropdownMenuItem(
                 text = { Text("Male", modifier = Modifier.padding(8.dp)) },
                 onClick = {
-                    selectedItem = "Male"
+                    profileViewModel.setGender(Gender.MALE)
                     isExpanded = false
                 }
             )
             DropdownMenuItem(
                 text = { Text("Female", modifier = Modifier.padding(8.dp)) },
                 onClick = {
-                    selectedItem = "Female"
+                    profileViewModel.setGender(Gender.FEMALE)
                     isExpanded = false
                 }
             )
             DropdownMenuItem(
                 text = { Text("Other", modifier = Modifier.padding(8.dp)) },
                 onClick = {
-                    selectedItem = "Other"
+                    profileViewModel.setGender(Gender.OTHERS)
                     isExpanded = false
                 }
             )
