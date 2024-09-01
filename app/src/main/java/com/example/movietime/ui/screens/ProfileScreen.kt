@@ -45,38 +45,15 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
-import com.example.movietime.model.Genre
-import com.example.movietime.model.Movie
 import com.example.movietime.utils.dummyMovies
 import com.example.movietime.viewmodels.ProfileViewModel
 import org.koin.androidx.compose.koinViewModel
-import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProfileScreen(onEditProfileClicked:()->Unit) {
     val profileViewModel: ProfileViewModel = koinViewModel()
-    val movie = Movie(
-        id = 1,
-        title = "Star Wars: The Last Jedi",
-        voteAverage = 9.5,
-        voteCount = 123,
-        summary = "Somewhat a story",
-        runtime = 120,
-        yearOfRelease = 2016,
-        genres = listOf(
-            Genre(1, "Family"),
-            Genre(2, "Drama"),
-            Genre(3, "Action"),
-            Genre(4, "Horror")
-        ),
-        adult = false, // Assuming it's not an adult movie
-        imageUrl = "https://example.com/last_jedi.jpg",
-        releaseDate = LocalDate.of(2016, 12, 15).toString(),
-        tagline = "The Saga Continues",
-        trailerUrl = "https://example.com/last_jedi-trailer.mp4"
-
-    )
+    val genres by profileViewModel.getFavouriteGenresList().observeAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,6 +68,8 @@ fun ProfileScreen(onEditProfileClicked:()->Unit) {
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             val imageId by profileViewModel.getProfileImageUrl().observeAsState()
+            val username by profileViewModel.getUsername().observeAsState("")
+            val userEmail by profileViewModel.getEmail().observeAsState("")
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(imageId)
@@ -115,7 +94,7 @@ fun ProfileScreen(onEditProfileClicked:()->Unit) {
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = "Shashank",
+                    text = username,
                     color = Color.White,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -123,7 +102,7 @@ fun ProfileScreen(onEditProfileClicked:()->Unit) {
                     fontSize = 18.sp
                 )
                 Text(
-                    text = "shashanksp1512@gmail.com",
+                    text = userEmail,
                     color = Color.White,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -169,7 +148,7 @@ fun ProfileScreen(onEditProfileClicked:()->Unit) {
         Row(
             modifier = Modifier.padding(start = 10.dp, end=20.dp,top = 10.dp)
         ) {
-            var times = movie.genres.size
+            var times = genres?.size?:0
             repeat(times) {
                 times--
                 Box(
@@ -191,12 +170,14 @@ fun ProfileScreen(onEditProfileClicked:()->Unit) {
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = movie.genres[times].genreName,
-                        modifier = Modifier,
-                        fontSize = 12.sp,
-                        color = Color.Gray
-                    )
+                    genres?.get(times)?.let { it1 ->
+                        Text(
+                            text = it1.genreName,
+                            modifier = Modifier,
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
+                    }
                 }
             }
         }
