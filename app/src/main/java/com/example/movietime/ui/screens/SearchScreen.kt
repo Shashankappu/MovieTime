@@ -85,7 +85,10 @@ fun SearchBox(mainViewModel: MainViewModel){
     val query by mainViewModel.getQuery().collectAsState()
     TextField(
         value = query,
-        onValueChange = { mainViewModel.setQuery(it) },
+        onValueChange = {
+            mainViewModel.setQuery(it)
+            mainViewModel.fetchMoviesBySearchQuery(it,null)
+        },
         placeholder = { Text(text = "Search", color = Color.Gray, fontSize = 16.sp) },
         leadingIcon = {
             Icon(
@@ -120,7 +123,7 @@ fun GenreRecommendationTabLayout(mainViewModel:MainViewModel){
     val tabTitles = listOf("All","Action","Sci-Fi", "Adventure","Drama")
     LaunchedEffect(Unit) {
         if (moviesList.isEmpty()) {
-            mainViewModel.fetchMoviesBySearchQuery("")
+            mainViewModel.fetchMoviesBySearchQuery("",null)
         }
     }
 
@@ -150,7 +153,10 @@ fun GenreRecommendationTabLayout(mainViewModel:MainViewModel){
                 selected = selectedTabIndex == index,
                 onClick = {
                     selectedTabIndex = index
-                    mainViewModel.fetchMoviesBySearchQuery(query)
+                    if(selectedTabIndex == 0)
+                        mainViewModel.fetchMoviesBySearchQuery(query,null)
+                    else
+                        mainViewModel.fetchMoviesBySearchQuery(query,tabTitles[selectedTabIndex])
                 },
                 text = {
                     Text(
