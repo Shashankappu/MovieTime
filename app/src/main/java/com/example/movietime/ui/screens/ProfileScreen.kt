@@ -3,13 +3,13 @@ package com.example.movietime.ui.screens
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,8 +21,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,11 +48,14 @@ import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.model.Genre
 import com.example.movietime.model.Movie
 import com.example.movietime.utils.dummyMovies
+import com.example.movietime.viewmodels.ProfileViewModel
+import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProfileScreen(onEditProfileClicked:()->Unit) {
+    val profileViewModel: ProfileViewModel = koinViewModel()
     val movie = Movie(
         id = 1,
         title = "Star Wars: The Last Jedi",
@@ -82,23 +90,28 @@ fun ProfileScreen(onEditProfileClicked:()->Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.avatar),
-                contentDescription = "Profile image",
+            val imageId by profileViewModel.getProfileImageUrl().observeAsState()
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageId)
+                    .crossfade(true)
+                    .build(),
+                placeholder = painterResource(R.drawable.godfather),
+                contentDescription = stringResource(R.string.app_name),
+                contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .size(120.dp)
                     .clip(RoundedCornerShape(50))
                     .border(
-                        border = BorderStroke(2.dp, Color.Gray.copy(0.4f)),
+                        border = BorderStroke(2.dp, Color.Gray),
                         shape = RoundedCornerShape(50)
-                    ),
-                contentScale = ContentScale.FillBounds
+                    )
             )
             Column(
                 modifier = Modifier
                     .padding(start = 10.dp)
                     .wrapContentSize(),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
@@ -119,20 +132,30 @@ fun ProfileScreen(onEditProfileClicked:()->Unit) {
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                 )
-                Text(
-                    text = "Edit profile",
-                    color = Color.White,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickableWithoutRipple {
-                            onEditProfileClicked()
-                        }
-                        .align(Alignment.CenterHorizontally),
-                    fontSize = 14.sp,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    textDecoration = TextDecoration.Underline
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ){
+                    Text(
+                        text = "Edit profile",
+                        color = Color.White,
+                        modifier = Modifier
+                            .clickableWithoutRipple {
+                                onEditProfileClicked()
+                            },
+                        fontSize = 14.sp,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        textDecoration = TextDecoration.Underline
+                    )
+                    Spacer(modifier = Modifier.width(2.dp))
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit Icon",
+                        modifier = Modifier.size(12.dp),
+                        tint = Color.White)
+                }
             }
         }
         Text(
