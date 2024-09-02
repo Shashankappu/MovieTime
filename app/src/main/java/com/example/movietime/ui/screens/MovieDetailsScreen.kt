@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -84,19 +85,24 @@ fun MovieDetails(movie: Movie){
         var isBookmarked by remember { mutableStateOf(false) }
         Row(
             horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ){
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(start = 20.dp, end = 20.dp)
+        ) {
             Text(
-                text = movie.title,
-                modifier = Modifier.padding(top = 12.dp, start = 20.dp),
+                text = "${movie.title}",
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .weight(1f), // Makes the text take up remaining space
                 fontSize = 24.sp,
+                lineHeight = 26.sp,
                 color = Color.White
             )
             Icon(
                 painter = painterResource(id = if(isBookmarked) R.drawable.bookmark_done else R.drawable.bookmark),
                 modifier = Modifier
                     .size(40.dp)
-                    .padding(start = 10.dp,top = 15.dp)
+                    .padding(start = 10.dp, top = 15.dp)
                     .clickableWithoutRipple {
                         isBookmarked = !isBookmarked
                     },
@@ -107,7 +113,7 @@ fun MovieDetails(movie: Movie){
         Row(
             modifier = Modifier
                 .size(220.dp, 24.dp)
-                .padding(start = 20.dp),
+                .padding(start = 20.dp, top = 5.dp),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ){
@@ -144,48 +150,40 @@ fun MovieDetails(movie: Movie){
             .padding(top = 10.dp, start = 20.dp, end = 20.dp),
             color = Color(0xFF515151)
         )
-        Column{
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp, start = 20.dp),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.spacedBy(60.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp, top = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(40.dp) // Spacing out the two columns evenly
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp) // Spacing between the label and the date
             ) {
                 Text(
                     text = "Release Date",
-                    modifier = Modifier,
                     fontSize = 16.sp,
                     color = Color.White
                 )
                 Text(
-                    text = "Genre",
-                    modifier = Modifier,
-                    fontSize = 16.sp,
-                    color = Color.White
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp, start = 20.dp),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.spacedBy(60.dp)
-            ) {
-                Text(
-                    text = "January 12, ${movie.yearOfRelease}",
-                    modifier = Modifier,
-                    fontSize = 12.sp,
+                    text = "${movie.releaseDate}",
+                    fontSize = 14.sp,
                     color = Color.Gray
                 )
-                 LazyRow(
-                     modifier = Modifier.padding(end=20.dp)
-                 ){
-                    items(movie.genres.size){ index ->
+            }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = "Genre",
+                    fontSize = 16.sp,
+                    color = Color.White
+                )
+                LazyRow {
+                    items(movie.genres.size) { index ->
                         Box(
                             modifier = Modifier
-                                .padding(2.dp)
-                                .size(60.dp, 25.dp)
+                                .padding(4.dp)
+                                .wrapContentSize()
                                 .background(
                                     Brush.linearGradient(
                                         colors = listOf(
@@ -203,8 +201,8 @@ fun MovieDetails(movie: Movie){
                         ) {
                             Text(
                                 text = movie.genres[index].genreName,
-                                modifier = Modifier,
                                 fontSize = 12.sp,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                 color = Color.Gray
                             )
                         }
@@ -224,7 +222,7 @@ fun MovieDetails(movie: Movie){
             fontSize = 16.sp,
             color = Color.White
         )
-        ReadMoreText()
+        ReadMoreText(movie.summary)
         Text(
             text = "Related Movies",
             modifier = Modifier.padding(start=20.dp,top=10.dp),
@@ -285,7 +283,7 @@ val summarySample =  """Rey (Daisy Ridley) finally manages to find the legendary
 @Composable
 fun ReadMoreText(synopsis:String=summarySample){
 
-    val minimumLineLength = 3
+    val minimumLineLength = 2
     var expandedState by remember { mutableStateOf(false) }
     var showReadMoreButtonState by remember { mutableStateOf(false) }
     val maxLines = if (expandedState) 200 else minimumLineLength
