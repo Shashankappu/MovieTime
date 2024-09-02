@@ -50,13 +50,14 @@ import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.model.Movie
 import com.example.movietime.ui.theme.orange
+import com.example.movietime.utils.dummyMovies
 import com.example.movietime.viewmodels.MainViewModel
 import org.koin.androidx.compose.koinViewModel
 
 private  val TAG = "HomeScreen"
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(onClick: () -> Unit) {
+fun HomeScreen(onClick: (movieData:Movie) -> Unit) {
     val mainViewModel: MainViewModel = koinViewModel()
     val moviesList by mainViewModel.moviesList.collectAsState()
     val topRatedMoviesList by mainViewModel.topRatedMoviesList.collectAsState()
@@ -88,18 +89,18 @@ fun HomeScreen(onClick: () -> Unit) {
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 20.dp),
             fontSize = 24.sp
         )
-        TopRatedCarousel(topRatedMoviesList)
+        TopRatedCarousel(topRatedMoviesList,onClick)
     }
 }
 
 @Composable
-fun NowPlayingMovieCard(onClick:()->Unit){
+fun NowPlayingMovieCard(onClick:(movieData:Movie)->Unit){
     Box(
         modifier = Modifier
             .padding(horizontal = 20.dp)
             .size(350.dp, 205.dp)
             .clip(shape = RoundedCornerShape(12))
-            .clickableWithoutRipple { onClick() }
+            .clickableWithoutRipple { onClick(dummyMovies[0]) }
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -164,7 +165,7 @@ fun TopRatedMovieCard(
     movieData : Movie,
     alpha: Float = 1f,
     scale: Float = 1f,
-    onClick : () -> Unit = {}
+    onClick : (movieData:Movie) -> Unit = {}
 ){
     Box(
         modifier = Modifier
@@ -176,7 +177,7 @@ fun TopRatedMovieCard(
                 scaleY = scale
             }
             .clickableWithoutRipple {
-                onClick()
+                onClick(movieData)
             }
             .clip(shape = RoundedCornerShape(12)),
         contentAlignment = Alignment.Center
@@ -282,7 +283,7 @@ fun TopRatedMovieCard(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TopRatedCarousel(topRatedMoviesList:List<Movie>) {
+fun TopRatedCarousel(topRatedMoviesList:List<Movie>,onClick: (movieData: Movie) -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
         if(topRatedMoviesList.isNotEmpty()) {
             val pagerState = rememberPagerState(initialPage = 1,pageCount = { topRatedMoviesList.size })
@@ -293,7 +294,9 @@ fun TopRatedCarousel(topRatedMoviesList:List<Movie>) {
             ) { index ->
                 val scale = if (pagerState.currentPage == index) 1.05f else 0.85f
                 val alpha = if (pagerState.currentPage == index) 1f else 0.85f
-                TopRatedMovieCard(topRatedMoviesList[index], scale = scale, alpha = alpha)
+                TopRatedMovieCard(topRatedMoviesList[index], scale = scale, alpha = alpha){
+                    onClick(topRatedMoviesList[index])
+                }
             }
         }
     }

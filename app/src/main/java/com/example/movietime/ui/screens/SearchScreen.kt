@@ -51,13 +51,14 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
+import com.example.movietime.model.Movie
 import com.example.movietime.ui.theme.orange
 import com.example.movietime.viewmodels.MainViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun SearchScreen(onClick: () -> Unit) {
+fun SearchScreen(onClick: (movieData: Movie) -> Unit) {
     val mainViewModel : MainViewModel = koinViewModel()
     Column(
         modifier = Modifier
@@ -172,7 +173,7 @@ fun GenreRecommendationTabLayout(mainViewModel:MainViewModel){
 }
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun StaggeredMovieLayout(mainViewModel:MainViewModel,onClick : ()-> Unit){
+fun StaggeredMovieLayout(mainViewModel:MainViewModel,onClick : (movieData:Movie)-> Unit){
     val moviesList by mainViewModel.searchedMoviesList.collectAsState()
     Log.d("Shashank","moviesByGenreList: $moviesList")
     LazyVerticalStaggeredGrid(
@@ -186,7 +187,7 @@ fun StaggeredMovieLayout(mainViewModel:MainViewModel,onClick : ()-> Unit){
                     .padding(10.dp)
                     .fillMaxSize()
                     .clickableWithoutRipple {
-                        onClick()
+                        onClick(movie)
                     }
             ) {
                 val height = if(index%2==0) 184.dp else 160.dp

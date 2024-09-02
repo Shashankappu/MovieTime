@@ -153,8 +153,8 @@ fun ProfileScreen(onEditProfileClicked:()->Unit) {
                 times--
                 Box(
                     modifier = Modifier
-                        .padding(2.dp)
-                        .size(60.dp, 25.dp)
+                        .padding(4.dp)
+                        .wrapContentSize()
                         .background(
                             Brush.linearGradient(
                                 colors = listOf(
@@ -173,7 +173,7 @@ fun ProfileScreen(onEditProfileClicked:()->Unit) {
                     genres?.get(times)?.let { it1 ->
                         Text(
                             text = it1.genreName,
-                            modifier = Modifier,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             fontSize = 12.sp,
                             color = Color.Gray
                         )
