@@ -3,6 +3,7 @@ package com.example.movietime.ui.screens
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -176,36 +177,48 @@ fun GenreRecommendationTabLayout(mainViewModel:MainViewModel){
 fun StaggeredMovieLayout(mainViewModel:MainViewModel,onClick : (movieData:Movie)-> Unit){
     val moviesList by mainViewModel.searchedMoviesList.collectAsState()
     Log.d("Shashank","moviesByGenreList: $moviesList")
-    LazyVerticalStaggeredGrid(
-        columns = StaggeredGridCells.Fixed(2),
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(moviesList.size) { index->
-            val movie = moviesList[index]
-            Column(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxSize()
-                    .clickableWithoutRipple {
-                        onClick(movie)
-                    }
-            ) {
-                val height = if(index%2==0) 184.dp else 160.dp
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(movie.imageUrl)
-                        .crossfade(true)
-                        .build(),
-                    placeholder = painterResource(R.drawable.godfather),
-                    contentDescription = stringResource(R.string.app_name),
-                    contentScale = ContentScale.FillBounds,
+    if(moviesList.isNotEmpty()) {
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(2),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(moviesList.size) { index ->
+                val movie = moviesList[index]
+                Column(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(16))
-                        .height(height)
-                        .width(154.dp),
-                )
-                Text(text = "${movie.title} (${movie.releaseDate})", modifier = Modifier.padding(top = 12.dp))
+                        .padding(10.dp)
+                        .fillMaxSize()
+                        .clickableWithoutRipple {
+                            onClick(movie)
+                        }
+                ) {
+                    val height = if (index % 2 == 0) 184.dp else 160.dp
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(movie.imageUrl)
+                            .crossfade(true)
+                            .build(),
+                        placeholder = painterResource(R.drawable.godfather),
+                        contentDescription = stringResource(R.string.app_name),
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16))
+                            .height(height)
+                            .width(154.dp),
+                    )
+                    Text(
+                        text = "${movie.title} (${movie.releaseDate})",
+                        modifier = Modifier.padding(top = 12.dp)
+                    )
+                }
             }
         }
+    }else{
+        Image(
+            painter = painterResource(id = R.drawable.no_movies_found_img),
+            contentDescription ="no movies found",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
     }
 }
