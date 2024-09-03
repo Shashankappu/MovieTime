@@ -7,32 +7,19 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,18 +28,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
+import com.example.movietime.ui.customcomponents.CustomDropDown
+import com.example.movietime.ui.customcomponents.CustomOutlinedTextField
 import com.example.movietime.ui.theme.bgPurple
 import com.example.movietime.ui.theme.orange
-import com.example.movietime.viewmodels.Gender
 import com.example.movietime.viewmodels.ProfileViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -184,115 +169,4 @@ fun EditProfileImage(
             )
         }
     }
-}
-
-@Composable
-fun CustomOutlinedTextField(
-    text :String,label :String,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    onValueChange:(String)->Unit
-){
-    var newText by remember { mutableStateOf(text) }
-    OutlinedTextField(
-        value = newText,
-        onValueChange = {
-            newText = it
-            onValueChange(it)
-        },
-        label = { Text(label) },
-        colors = TextFieldDefaults.colors(
-            focusedLabelColor = Color.White,
-            focusedTextColor = Color.White, // Text color when the field is focused
-            unfocusedTextColor = Color.Gray, // Text color when the field is unfocused
-            focusedIndicatorColor = orange, // Border color when focused
-            unfocusedIndicatorColor = Color.Gray, // Border color when unfocused
-            cursorColor = Color.White, // Cursor color
-            focusedContainerColor = bgPurple,
-            unfocusedContainerColor = bgPurple
-        ),
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        textStyle = TextStyle(textAlign = TextAlign.Left, fontSize = 16.sp),
-        shape = RoundedCornerShape(10.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .background(bgPurple, RoundedCornerShape(10.dp))
-    )
-}
-
-
-@Composable
-fun CustomDropDown(profileViewModel:ProfileViewModel) {
-    var isExpanded by remember { mutableStateOf(false) }
-    val selectedItem by profileViewModel.getGender().observeAsState()
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .background(bgPurple, RoundedCornerShape(10.dp))
-            .clickableWithoutRipple {
-                isExpanded = true
-            }
-            .border(
-                BorderStroke(
-                    if (isExpanded) 2.dp else 0.dp,
-                    if (isExpanded) orange else Color.Gray
-                ), RoundedCornerShape(10.dp)
-            )
-            .padding(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = selectedItem.toString(),
-                color = Color.White,
-                fontSize = 16.sp
-            )
-            Icon(
-                imageVector = if(!isExpanded) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
-                contentDescription = "Dropdown Icon",
-                tint = Color.White,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-
-        DropdownMenu(
-            expanded = isExpanded,
-            onDismissRequest = { isExpanded = false },
-            modifier = Modifier
-                .size(200.dp, 150.dp)
-                .background(bgPurple)
-        ) {
-            DropdownMenuItem(
-                text = { Text("Male", modifier = Modifier.padding(8.dp)) },
-                onClick = {
-                    profileViewModel.setGender(Gender.MALE)
-                    isExpanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Female", modifier = Modifier.padding(8.dp)) },
-                onClick = {
-                    profileViewModel.setGender(Gender.FEMALE)
-                    isExpanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("Other", modifier = Modifier.padding(8.dp)) },
-                onClick = {
-                    profileViewModel.setGender(Gender.OTHERS)
-                    isExpanded = false
-                }
-            )
-        }
-    }
-}
-
-private fun saveData(email: String,lastname:String,firstname:String,username:String){
-
 }
