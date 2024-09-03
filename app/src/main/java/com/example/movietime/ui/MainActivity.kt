@@ -27,7 +27,10 @@ class MainActivity : ComponentActivity() {
                 Surface(color = bgPurple) {
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
-                        bottomBar = { BottomNavigationBar(navController = navController)})
+                        bottomBar = {
+                            BottomNavigationBar(navController = navController)
+                        }
+                    )
                     { padding ->
                         NavHostContainer(navController = navController, padding = padding)
                     }

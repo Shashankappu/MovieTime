@@ -17,42 +17,42 @@ import com.example.movietime.utils.Constants
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
 
-    BottomNavigation(
-        backgroundColor = bgPurple
-    ) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-
-        val currentRoute = navBackStackEntry?.destination?.route
-
-        Constants.BottomNavItems.forEach { navItem ->
-            val isSelected = currentRoute == navItem.route
-            BottomNavigationItem(
-                selected = isSelected,
-                onClick = {
-                    navController.navigate(navItem.route) {
-                        // Pop up to the start destination to avoid building up a large backstack
-                        navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route) {
-                                saveState = true
+    val currentRoute = navBackStackEntry?.destination?.route
+    if(currentRoute!="user_registration") {
+        BottomNavigation(
+            backgroundColor = bgPurple
+        ) {
+            Constants.BottomNavItems.forEach { navItem ->
+                val isSelected = currentRoute == navItem.route
+                BottomNavigationItem(
+                    selected = isSelected,
+                    onClick = {
+                        navController.navigate(navItem.route) {
+                            // Pop up to the start destination to avoid building up a large backstack
+                            navController.graph.startDestinationRoute?.let { route ->
+                                popUpTo(route) {
+                                    saveState = true
+                                }
                             }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-                icon = {
-                    Icon(
-                        painter = painterResource(id = navItem.icon),
-                        contentDescription = navItem.label,
-                        tint =  if (isSelected) orange else Color.Gray.copy(alpha = 0.3f)
-                    )
-                },
-                label = {
-                    Text(text = navItem.label)
-                },
-                alwaysShowLabel = false
-            )
+                    },
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = navItem.icon),
+                            contentDescription = navItem.label,
+                            tint = if (isSelected) orange else Color.Gray.copy(alpha = 0.3f)
+                        )
+                    },
+                    label = {
+                        Text(text = navItem.label)
+                    },
+                    alwaysShowLabel = false
+                )
+            }
         }
     }
 }

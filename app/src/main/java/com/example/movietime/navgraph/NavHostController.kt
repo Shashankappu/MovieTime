@@ -16,6 +16,7 @@ import com.example.movietime.ui.screens.HomeScreen
 import com.example.movietime.ui.screens.MovieDetailsScreen
 import com.example.movietime.ui.screens.ProfileScreen
 import com.example.movietime.ui.screens.SearchScreen
+import com.example.movietime.ui.screens.UserRegistrationScreen
 import com.google.gson.Gson
 
 @Composable
@@ -26,11 +27,15 @@ fun NavHostContainer(
 
     NavHost(
         navController = navController,
-        startDestination = "home",
+        startDestination = Screen.USER_REGISTRATION,
         modifier = Modifier.padding(paddingValues = padding),
         builder = {
-
-            composable("home") {
+            composable(route=Screen.USER_REGISTRATION){
+                UserRegistrationScreen {
+                    navController.navigate("home")
+                }
+            }
+            composable(Screen.HOME) {
                 HomeScreen { movie ->
                     val movieJson = Uri.encode(Gson().toJson(movie))
                     navController.navigate("details/$movieJson"){
@@ -43,7 +48,7 @@ fun NavHostContainer(
             }
 
             // route : search
-            composable("search") {
+            composable(Screen.SEARCH) {
                 SearchScreen{ movie ->
                     val movieJson = Uri.encode(Gson().toJson(movie))
                     navController.navigate("details/$movieJson"){
@@ -56,7 +61,7 @@ fun NavHostContainer(
             }
 
             // route : profile
-            composable("profile") {
+            composable(Screen.PROFILE) {
                 ProfileScreen{
                     navController.navigate("edit_profile")
                 }
@@ -76,7 +81,7 @@ fun NavHostContainer(
                 }
             }
 
-            composable("edit_profile"){
+            composable(Screen.EDIT_PROFILE){
                 EditProfileScreen {
                     navController.navigateUp()
                 }
