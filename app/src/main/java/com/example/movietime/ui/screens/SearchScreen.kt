@@ -125,7 +125,8 @@ fun GenreRecommendationTabLayout(mainViewModel:MainViewModel){
     val tabTitles = listOf("All","Action","Sci-Fi", "Adventure","Drama")
     LaunchedEffect(Unit) {
         if (moviesList.isEmpty()) {
-            mainViewModel.fetchMoviesBySearchQuery("",null)
+            if(selectedTabIndex!=0) mainViewModel.fetchMoviesBySearchQuery("",tabTitles[selectedTabIndex])
+            else mainViewModel.fetchMoviesBySearchQuery("",null)
         }
     }
 
