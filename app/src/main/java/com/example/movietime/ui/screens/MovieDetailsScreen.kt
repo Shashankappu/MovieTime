@@ -67,7 +67,7 @@ fun MovieDetailsScreen(movie:Movie,onBackPressed : ()-> Unit){
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState())
     ) {
-        ExoPlayerView("https://www.onirikal.com/videos/mp4/animatic_caronte.mp4")
+        ExoPlayerView()
         MovieDetails(movie)
     }
     Box(
@@ -381,6 +381,6 @@ fun ExoPlayerView(movieUrl:String = "https://commondatastorage.googleapis.com/gt
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(300.dp) // Set your desired height
+            .height(250.dp) // Set your desired height
     )
 }
