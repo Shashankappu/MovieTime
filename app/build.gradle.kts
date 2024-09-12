@@ -78,4 +78,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.0.0-rc01")
     //lottie
     implementation("com.airbnb.android:lottie-compose:4.0.0")
+
+    implementation("androidx.media3:media3-exoplayer:1.2.0")
+    implementation("androidx.media3:media3-ui:1.2.0")
 }

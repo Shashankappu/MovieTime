@@ -23,12 +23,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,18 +41,24 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.model.Movie
-import com.example.movietime.ui.theme.orange
 import com.example.movietime.utils.dummyMovies
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -60,7 +67,7 @@ fun MovieDetailsScreen(movie:Movie,onBackPressed : ()-> Unit){
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState())
     ) {
-        CurrentMovieImage(movie)
+        ExoPlayerView("https://www.onirikal.com/videos/mp4/animatic_caronte.mp4")
         MovieDetails(movie)
     }
     Box(
@@ -312,38 +319,68 @@ fun ReadMoreText(synopsis:String=summarySample){
         }
     }
 }
+
 @Composable
-fun CurrentMovieImage(movie: Movie){
-    Box{
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(movie.imageUrl)
-                .crossfade(true)
-                .build(),
-            placeholder = painterResource(R.drawable.godfather),
-            contentDescription = stringResource(R.string.app_name),
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(290.dp),
-        )
-        Box(
-            modifier = Modifier
-                .padding(top = 110.dp, start = 145.dp)
-                .size(64.dp)
-                .background(
-                    color = Color.White.copy(0.3f),
-                    shape = RoundedCornerShape(50)
-                )
-                .border(BorderStroke(2.dp, Color.Gray.copy(0.4f)), RoundedCornerShape(50)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Filled.PlayArrow,
-                contentDescription = "play icon",
-                modifier = Modifier.size(42.dp),
-                tint = orange
-            )
+fun ExoPlayerView(movieUrl:String = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4") {
+    val EXAMPLE_VIDEO_URI = movieUrl
+    var lifecycle by remember{
+        mutableStateOf(Lifecycle.Event.ON_CREATE)
+    }
+    // Get the current context
+    val context = LocalContext.current
+
+    // Initialize ExoPlayer
+    val exoPlayer = ExoPlayer.Builder(context).build()
+
+    // Create a MediaSource
+    val mediaSource = remember(EXAMPLE_VIDEO_URI) {
+        MediaItem.fromUri(EXAMPLE_VIDEO_URI)
+    }
+
+    // Set MediaSource to ExoPlayer
+    LaunchedEffect(mediaSource) {
+        exoPlayer.setMediaItem(mediaSource)
+        exoPlayer.prepare()
+    }
+
+    // Manage lifecycle events
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver{_,event ->
+            lifecycle = event
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            exoPlayer.release()
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
+
+
+    // Use AndroidView to embed an Android View (PlayerView) into Compose
+    AndroidView(
+        factory = { ctx ->
+            PlayerView(ctx).apply {
+                player = exoPlayer
+            }
+        },
+        update = {
+            when (lifecycle) {
+                Lifecycle.Event.ON_PAUSE -> {
+                    it.onPause()
+                    it.player?.pause()
+                }
+
+                Lifecycle.Event.ON_RESUME -> {
+                    it.onResume()
+                }
+
+                else -> Unit
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(300.dp) // Set your desired height
+    )
 }
