@@ -1,5 +1,7 @@
 package com.example.movietime.ui.screens
 
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +30,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -51,6 +55,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.MediaItem
@@ -64,13 +70,22 @@ import com.example.movietime.model.Movie
 import com.example.movietime.viewmodels.MainViewModel
 import org.koin.androidx.compose.koinViewModel
 
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun MovieDetailsScreen(movie:Movie,onBackPressed : ()-> Unit){
+    val mainViewModel : MainViewModel = koinViewModel()
+    val isFullscreen by mainViewModel.isFullScreenEnabled().collectAsState()
     Column(
-        modifier = Modifier.verticalScroll(rememberScrollState())
+        modifier = Modifier
+            .let { modifier ->
+                if (isFullscreen) {
+                    modifier.fillMaxSize() // Fullscreen height
+                } else {
+                    modifier.verticalScroll(rememberScrollState()) // Non-fullscreen height
+                }
+            }
     ) {
-        ExoPlayerView()
+        ExoPlayerView(mainViewModel= mainViewModel)
         MovieDetails(movie)
     }
     Box(
@@ -332,67 +347,104 @@ fun ReadMoreText(synopsis:String=summarySample){
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.R)
 @Composable
-fun ExoPlayerView(movieUrl:String = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4") {
-    val EXAMPLE_VIDEO_URI = movieUrl
-    var lifecycle by remember{
-        mutableStateOf(Lifecycle.Event.ON_CREATE)
-    }
-    // Get the current context
+fun ExoPlayerView(
+    movieUrl: String = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    mainViewModel : MainViewModel
+) {
     val context = LocalContext.current
+    val activity = context as Activity
 
-    // Initialize ExoPlayer
-    val exoPlayer = ExoPlayer.Builder(context).build()
+    val exoPlayer = remember { ExoPlayer.Builder(context).build() }
+    val mediaSource = remember(movieUrl) { MediaItem.fromUri(movieUrl) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val isFullscreen by mainViewModel.isFullScreenEnabled().collectAsState()
 
-    // Create a MediaSource
-    val mediaSource = remember(EXAMPLE_VIDEO_URI) {
-        MediaItem.fromUri(EXAMPLE_VIDEO_URI)
-    }
-
-    // Set MediaSource to ExoPlayer
+    // Prepare media source
     LaunchedEffect(mediaSource) {
         exoPlayer.setMediaItem(mediaSource)
         exoPlayer.prepare()
     }
 
-    // Manage lifecycle events
-    val lifecycleOwner = LocalLifecycleOwner.current
+    // Manage lifecycle
     DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver{_,event ->
-            lifecycle = event
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                exoPlayer.release()
+            }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-
         onDispose {
-            exoPlayer.release()
+            exoPlayer.stop()
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
+    // Fullscreen toggle function
+    fun toggleFullscreen() {
+        if (isFullscreen) {
+            // Exit fullscreen
+            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            WindowCompat.setDecorFitsSystemWindows(activity.window, true)
+            activity.window.insetsController?.show(WindowInsetsCompat.Type.systemBars())
+        } else {
+            // Enter fullscreen
+            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            WindowCompat.setDecorFitsSystemWindows(activity.window, false)
+            activity.window.insetsController?.hide(WindowInsetsCompat.Type.systemBars())
+        }
+        mainViewModel.setFullScreenEnabled(!isFullscreen)
+    }
 
-    // Use AndroidView to embed an Android View (PlayerView) into Compose
-    AndroidView(
-        factory = { ctx ->
-            PlayerView(ctx).apply {
-                player = exoPlayer
-            }
-        },
-        update = {
-            when (lifecycle) {
-                Lifecycle.Event.ON_PAUSE -> {
-                    it.onPause()
-                    it.player?.pause()
-                }
-
-                Lifecycle.Event.ON_RESUME -> {
-                    it.onResume()
-                }
-
-                else -> Unit
-            }
-        },
+    // Use AndroidView to embed PlayerView
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(250.dp) // Set your desired height
-    )
+            .fillMaxSize()
+            .padding(0.dp)
+    ) {
+        AndroidView(
+            factory = { ctx ->
+                PlayerView(ctx).apply {
+                    player = exoPlayer
+                    useController = true // Show controls
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .let { modifier ->
+                    if (isFullscreen) {
+                        modifier.fillMaxHeight() // Fullscreen height
+                    } else {
+                        modifier.height(250.dp) // Non-fullscreen height
+                    }
+                }
+        )
+
+        // Fullscreen button
+        IconButton(
+            onClick = { toggleFullscreen() },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(8.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = if (isFullscreen) R.drawable.minimize else R.drawable.maximize),
+                contentDescription = "Fullscreen Toggle"
+            )
+        }
+    }
+
+    // Handle orientation changes and player state
+    LaunchedEffect(isFullscreen) {
+        if (isFullscreen) {
+            // Enter fullscreen actions
+            // For example, save current playback state if needed
+            exoPlayer.playWhenReady = true
+        } else {
+            // Exit fullscreen actions
+            // For example, pause or stop the player if needed
+            exoPlayer.playWhenReady = false
+        }
+    }
 }

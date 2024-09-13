@@ -17,6 +17,7 @@ class MainViewModel(private val movieService: MovieService) : ViewModel(){
     private val _topRatedMoviesList = MutableStateFlow<List<Movie>>(emptyList())
     private val _moviesByGenreList = MutableStateFlow<List<Movie>>(emptyList())
     private val _relatedMoviesList = MutableStateFlow<List<Movie>>(emptyList())
+    private val _isFullScreenEnabled = MutableStateFlow(false)
     val moviesList: MutableStateFlow<List<Movie>> get() = _moviesList
     val relatedMoviesList:MutableStateFlow<List<Movie>> get() = _relatedMoviesList
 
@@ -25,6 +26,10 @@ class MainViewModel(private val movieService: MovieService) : ViewModel(){
     val topRatedMoviesList: MutableStateFlow<List<Movie>> get() = _topRatedMoviesList
     val moviesByGenreList : MutableStateFlow<List<Movie>> get() = _moviesByGenreList
 
+    fun isFullScreenEnabled(): StateFlow<Boolean> = _isFullScreenEnabled
+    fun setFullScreenEnabled(enabled: Boolean) {
+        _isFullScreenEnabled.value = enabled
+    }
     fun setQuery(query: String){
         _query.value = query
     }
