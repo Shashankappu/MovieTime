@@ -1,6 +1,7 @@
 package com.example.movietime.ui.screens
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -30,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,7 +61,8 @@ import coil.request.ImageRequest
 import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.model.Movie
-import com.example.movietime.utils.dummyMovies
+import com.example.movietime.viewmodels.MainViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -238,20 +241,29 @@ fun MovieDetails(movie: Movie){
             maxLines = 2,
             color = Color.White
         )
-        RelatedMoviesCarousel()
+        RelatedMoviesCarousel(movie)
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun RelatedMoviesCarousel(onClick:()->Unit = {}){
+fun RelatedMoviesCarousel(movie:Movie,onClick:()->Unit = {}){
+    val mainViewModel : MainViewModel = koinViewModel()
+    val relatedMoviesList by mainViewModel.relatedMoviesList.collectAsState()
+    LaunchedEffect(key1 = relatedMoviesList) {
+        if(relatedMoviesList.isEmpty()) {
+            val genresString = movie.genres.joinToString(","){ it.genreName}
+            mainViewModel.fetchMovieByMultipleGenres(genresString)
+            Log.d("Shashank","relatedMoviesList: $relatedMoviesList with genreString: $genresString")
+        }
+    }
     LazyRow(
         modifier = Modifier
             .padding(start = 20.dp, top = 10.dp, end = 20.dp)
             .fillMaxWidth()
     ) {
-        items(dummyMovies.size) { index->
-            val movie = dummyMovies[index]
+        items(relatedMoviesList.size) { index ->
+            val relatedMovie = relatedMoviesList[index]
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -262,7 +274,7 @@ fun RelatedMoviesCarousel(onClick:()->Unit = {}){
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(movie.imageUrl)
+                        .data(relatedMovie.imageUrl)
                         .crossfade(true)
                         .build(),
                     placeholder = painterResource(R.drawable.godfather),
@@ -274,7 +286,7 @@ fun RelatedMoviesCarousel(onClick:()->Unit = {}){
                         .width(150.dp),
                 )
                 Text(
-                    text = "${movie.title}\n(${movie.yearOfRelease})",
+                    text = "${relatedMovie.title}\n(${relatedMovie.releaseDate})",
                     fontSize = 12.sp,
                     modifier = Modifier
                         .height(50.dp)
