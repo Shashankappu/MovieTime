@@ -16,6 +16,9 @@ interface MovieService {
     @GET("movies/by-genre")
     suspend fun getMovieByGenre(@Query("genre") genre: String) : List<Movie>
 
+    @GET("movies/by-genres")
+    suspend fun getMovieByMultipleGenres(@Query("genres") genres: String) : List<Movie>
+
     @GET("movies/search")
     suspend fun getMovieBySearchQuery(@Query("query") query: String,@Query("genreName") genreName:String?) : List<Movie>
 }

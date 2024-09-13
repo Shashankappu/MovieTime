@@ -16,7 +16,9 @@ class MainViewModel(private val movieService: MovieService) : ViewModel(){
     private val _searchedMoviesList = MutableStateFlow<List<Movie>>(emptyList())
     private val _topRatedMoviesList = MutableStateFlow<List<Movie>>(emptyList())
     private val _moviesByGenreList = MutableStateFlow<List<Movie>>(emptyList())
+    private val _relatedMoviesList = MutableStateFlow<List<Movie>>(emptyList())
     val moviesList: MutableStateFlow<List<Movie>> get() = _moviesList
+    val relatedMoviesList:MutableStateFlow<List<Movie>> get() = _relatedMoviesList
 
     fun getQuery(): StateFlow<String> = _query
     val searchedMoviesList: MutableStateFlow<List<Movie>> get() = _searchedMoviesList
@@ -71,4 +73,16 @@ class MainViewModel(private val movieService: MovieService) : ViewModel(){
             }
         }
     }
+
+    fun fetchMovieByMultipleGenres(genres : String) {
+        viewModelScope.launch {
+            try {
+                val movies = movieService.getMovieByMultipleGenres(genres)
+                _relatedMoviesList.value = movies
+            } catch (e: Exception) {
+                Log.d(TAG," related movies $e")
+            }
+        }
+    }
+
 }
