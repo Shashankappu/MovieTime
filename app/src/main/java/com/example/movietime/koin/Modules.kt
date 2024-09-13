@@ -3,6 +3,7 @@ package com.example.movietime.koin
 import com.example.movietime.movieservice.MovieService
 import com.example.movietime.viewmodels.MainViewModel
 import com.example.movietime.viewmodels.ProfileViewModel
+import com.example.movietime.viewmodels.UserRegistrationViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -22,4 +23,5 @@ val appModule  = module {
 
     viewModel { MainViewModel(get()) }
     viewModel { ProfileViewModel() }
+    viewModel { UserRegistrationViewModel() }
 }
