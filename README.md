@@ -1,2 +1,2 @@
-Movies DB using MoovY API (custom API for fetching movie Data) 
+Movies App using MoovY API (custom API for fetching movie Data) 
 **UNDER DEVELOPMENT**
