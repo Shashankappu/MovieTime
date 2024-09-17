@@ -1,7 +1,6 @@
 package com.example.movietime.ui.screens
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -14,38 +13,26 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.ui.customcomponents.CustomDropDown
 import com.example.movietime.ui.customcomponents.CustomOutlinedTextField
 import com.example.movietime.ui.theme.bgPurple
 import com.example.movietime.ui.theme.orange
 import com.example.movietime.viewmodels.ProfileViewModel
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EditProfileScreen(
+    profileViewModel: ProfileViewModel,
     onSubmit:()->Unit
 ) {
-    val profileViewModel:ProfileViewModel = koinViewModel()
     Column(
         modifier = Modifier
             .padding(horizontal = 10.dp)
@@ -68,7 +55,6 @@ fun EditProfileScreen(
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            EditProfileImage(profileViewModel)
             CustomDropDown(profileViewModel)
             UserNameField(profileViewModel)
             FirstNameField(profileViewModel)
@@ -120,53 +106,5 @@ fun UserEmailField(profileViewModel: ProfileViewModel){
     val userEmail by profileViewModel.getEmail().observeAsState("")
     CustomOutlinedTextField(text= userEmail,label = "Email"){
         profileViewModel.setEmail(it)
-    }
-}
-
-@Composable
-fun EditProfileImage(
-    profileViewModel: ProfileViewModel,
-    onClick:() -> Unit = {}
-){
-    val imageId by profileViewModel.getProfileImageUrl().observeAsState()
-    Box(
-        modifier = Modifier.padding(20.dp)
-    ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(imageId)
-                .crossfade(true)
-                .build(),
-            placeholder = painterResource(R.drawable.godfather),
-            contentDescription = stringResource(R.string.app_name),
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier
-                .size(120.dp)
-                .clip(RoundedCornerShape(50))
-                .border(
-                    border = BorderStroke(2.dp, Color.Gray),
-                    shape = RoundedCornerShape(50)
-                )
-        )
-        Box(
-            modifier = Modifier.align(Alignment.BottomEnd)
-        ){
-            Image(
-                imageVector = Icons.Default.Edit,
-                contentDescription = "edit profile",
-                modifier = Modifier
-                    .size(35.dp)
-                    .clip(RoundedCornerShape(50))
-                    .border(
-                        border = BorderStroke(2.dp, Color.Gray.copy(0.4f)),
-                        shape = RoundedCornerShape(50)
-                    )
-                    .background(orange)
-                    .clickableWithoutRipple {
-                        onClick()
-                    },
-                contentScale = ContentScale.Inside
-            )
-        }
     }
 }

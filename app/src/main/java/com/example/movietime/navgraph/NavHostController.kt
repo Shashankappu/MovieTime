@@ -17,7 +17,9 @@ import com.example.movietime.ui.screens.MovieDetailsScreen
 import com.example.movietime.ui.screens.ProfileScreen
 import com.example.movietime.ui.screens.SearchScreen
 import com.example.movietime.ui.screens.UserRegistrationScreen
+import com.example.movietime.viewmodels.ProfileViewModel
 import com.google.gson.Gson
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun NavHostContainer(
@@ -62,7 +64,8 @@ fun NavHostContainer(
 
             // route : profile
             composable(Screen.PROFILE) {
-                ProfileScreen{
+                val profileViewModel:ProfileViewModel = koinViewModel()
+                ProfileScreen(profileViewModel){
                     navController.navigate("edit_profile")
                 }
             }
@@ -82,8 +85,9 @@ fun NavHostContainer(
             }
 
             composable(Screen.EDIT_PROFILE){
-                EditProfileScreen {
-                    navController.navigateUp()
+                val profileViewModel:ProfileViewModel = koinViewModel()
+                EditProfileScreen(profileViewModel) {
+                    navController.popBackStack()
                 }
             }
         }

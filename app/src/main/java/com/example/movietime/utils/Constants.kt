@@ -5,6 +5,12 @@ import com.example.movietime.model.Genre
 import com.example.movietime.model.Movie
 
 object Constants {
+    // SHAREDPREF CONSTANTS
+    const val PREFS_NAME = "app_prefs"
+    const val KEY_PROFILE_IMAGE_URI = "profile_image_uri"
+    const val DEFAULT_PROFILE_IMAGE_URI = "" // Default value if none is set
+
+    //BOTTOM NAV ITEMS
     val BottomNavItems = listOf(
         BottomNavItem(
             label = "Home",
@@ -24,6 +30,7 @@ object Constants {
     )
 }
 
+// DUMMY DATA
 val dummyMovies = listOf(
     Movie(
         id = 1,

@@ -1,14 +1,20 @@
 package com.example.movietime.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.movietime.model.Genre
+import com.example.movietime.sharedpreference.StateManager
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 enum class Gender(val id : Int){
     MALE(0),FEMALE(1),OTHERS(2)
 }
-class ProfileViewModel : ViewModel() {
+class ProfileViewModel(private val stateManager: StateManager) : ViewModel() {
     private val genres = listOf(
         Genre(1, "Family"),
         Genre(2, "Drama"),
@@ -20,7 +26,7 @@ class ProfileViewModel : ViewModel() {
     private val _firstname = MutableLiveData("Shashank")
     private val _lastname = MutableLiveData("S P")
     private val _email = MutableLiveData("shashanksp1512@gmail.com")
-    private val _profileImageUrl = MutableLiveData("https://media.sproutsocial.com/uploads/2022/06/profile-picture.jpeg")
+    private val _profileImageUrl = MutableStateFlow(stateManager.getProfileImageUrl())
     private val _favouriteGenresList = MutableLiveData(genres)
 
     fun getFavouriteGenresList() : LiveData<List<Genre>> = _favouriteGenresList
@@ -29,7 +35,7 @@ class ProfileViewModel : ViewModel() {
     fun getFirstName() : LiveData<String> = _firstname
     fun getLastName() : LiveData<String> = _lastname
     fun getEmail() : LiveData<String> = _email
-    fun getProfileImageUrl() : LiveData<String> = _profileImageUrl
+    fun getProfileImageUrl() : StateFlow<String> = _profileImageUrl
 
     fun setGender(gender: Gender){
         _gender.postValue(gender)
@@ -52,7 +58,11 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun setProfileImageUrl(imageUrl: String){
-        _email.postValue(imageUrl)
+        _profileImageUrl.value = imageUrl
+        viewModelScope.launch {
+            Log.d("Shashank","Profile Image Url : $imageUrl")
+            stateManager.setProfileImageUrl(imageUrl)
+        }
     }
 
     fun setFavouriteGenresList(genres : List<Genre>){
