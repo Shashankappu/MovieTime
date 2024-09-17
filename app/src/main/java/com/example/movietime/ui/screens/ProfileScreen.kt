@@ -1,8 +1,12 @@
 package com.example.movietime.ui.screens
 
+import android.net.Uri
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +30,8 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -42,21 +48,22 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
+import com.example.movietime.ui.theme.orange
 import com.example.movietime.utils.dummyMovies
 import com.example.movietime.viewmodels.ProfileViewModel
-import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ProfileScreen(onEditProfileClicked:()->Unit) {
-    val profileViewModel: ProfileViewModel = koinViewModel()
+fun ProfileScreen(profileViewModel: ProfileViewModel,onEditProfileClicked:()->Unit) {
     val genres by profileViewModel.getFavouriteGenresList().observeAsState()
-    val imageId by profileViewModel.getProfileImageUrl().observeAsState()
     val username by profileViewModel.getUsername().observeAsState("")
     val userEmail by profileViewModel.getEmail().observeAsState("")
+    val imageUri by profileViewModel.getProfileImageUrl().collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -70,22 +77,7 @@ fun ProfileScreen(onEditProfileClicked:()->Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(imageId)
-                    .crossfade(true)
-                    .build(),
-                placeholder = painterResource(R.drawable.godfather),
-                contentDescription = stringResource(R.string.app_name),
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(50))
-                    .border(
-                        border = BorderStroke(2.dp, Color.Gray),
-                        shape = RoundedCornerShape(50)
-                    )
-            )
+            EditProfileImage(profileViewModel)
             Column(
                 modifier = Modifier
                     .padding(start = 10.dp)
@@ -208,6 +200,65 @@ fun ProfileScreen(onEditProfileClicked:()->Unit) {
                 fontSize = 24.sp
             )
             WatchedMoviesCarousel()
+        }
+    }
+}
+
+@Composable
+fun EditProfileImage(
+    profileViewModel: ProfileViewModel
+){
+    val imageUri by profileViewModel.getProfileImageUrl().collectAsState()
+    val context = LocalContext.current
+    LaunchedEffect(imageUri) {
+        profileViewModel.setProfileImageUrl(imageUri)
+    }
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            profileViewModel.setProfileImageUrl(it.toString())
+        }
+    }
+    Box(
+        modifier = Modifier.padding(20.dp)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUri)
+                .crossfade(true)
+                .diskCachePolicy(CachePolicy.DISABLED) // Disable disk cache temporarily
+                .build(),
+            placeholder = painterResource(R.drawable.godfather),
+            contentDescription = stringResource(R.string.app_name),
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(120.dp)
+                .clip(RoundedCornerShape(50))
+                .border(
+                    border = BorderStroke(2.dp, Color.Gray),
+                    shape = RoundedCornerShape(50)
+                )
+        )
+        Box(
+            modifier = Modifier.align(Alignment.BottomEnd)
+        ){
+            Image(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "edit profile",
+                modifier = Modifier
+                    .size(35.dp)
+                    .clip(RoundedCornerShape(50))
+                    .border(
+                        border = BorderStroke(2.dp, Color.Gray.copy(0.4f)),
+                        shape = RoundedCornerShape(50)
+                    )
+                    .background(orange)
+                    .clickableWithoutRipple {
+                        imagePickerLauncher.launch("image/*")
+                    },
+                contentScale = ContentScale.Inside
+            )
         }
     }
 }

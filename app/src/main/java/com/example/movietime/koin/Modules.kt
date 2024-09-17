@@ -1,9 +1,12 @@
 package com.example.movietime.koin
 
 import com.example.movietime.movieservice.MovieService
+import com.example.movietime.sharedpreference.SharedPreferencesHelper
+import com.example.movietime.sharedpreference.StateManager
 import com.example.movietime.viewmodels.MainViewModel
 import com.example.movietime.viewmodels.ProfileViewModel
 import com.example.movietime.viewmodels.UserRegistrationViewModel
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -20,8 +23,11 @@ val appModule  = module {
     single<MovieService> {
         get<Retrofit>().create(MovieService::class.java)
     }
+    single { SharedPreferencesHelper(androidContext()) }
+    single { StateManager(get()) }
 
+    // Inject StateManager into ProfileViewModel
+    viewModel { ProfileViewModel(get()) }
     viewModel { MainViewModel(get()) }
-    viewModel { ProfileViewModel() }
     viewModel { UserRegistrationViewModel() }
 }
