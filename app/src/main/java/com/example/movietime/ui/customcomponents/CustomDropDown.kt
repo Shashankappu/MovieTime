@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.sp
 import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.ui.theme.bgPurple
 import com.example.movietime.ui.theme.orange
-import com.example.movietime.viewmodels.Gender
 import com.example.movietime.viewmodels.ProfileViewModel
 
 @Composable
@@ -83,21 +82,21 @@ fun CustomDropDown(profileViewModel: ProfileViewModel) {
             DropdownMenuItem(
                 text = { Text("Male", modifier = Modifier.padding(8.dp)) },
                 onClick = {
-                    profileViewModel.setGender(Gender.MALE)
+                    profileViewModel.setGender("MALE")
                     isExpanded = false
                 }
             )
             DropdownMenuItem(
                 text = { Text("Female", modifier = Modifier.padding(8.dp)) },
                 onClick = {
-                    profileViewModel.setGender(Gender.FEMALE)
+                    profileViewModel.setGender("FEMALE")
                     isExpanded = false
                 }
             )
             DropdownMenuItem(
-                text = { Text("Other", modifier = Modifier.padding(8.dp)) },
+                text = { Text("Others", modifier = Modifier.padding(8.dp)) },
                 onClick = {
-                    profileViewModel.setGender(Gender.OTHERS)
+                    profileViewModel.setGender("OTHERS")
                     isExpanded = false
                 }
             )

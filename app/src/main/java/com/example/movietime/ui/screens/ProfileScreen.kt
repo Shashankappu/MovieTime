@@ -62,7 +62,6 @@ fun ProfileScreen(profileViewModel: ProfileViewModel,onEditProfileClicked:()->Un
     val genres by profileViewModel.getFavouriteGenresList().observeAsState()
     val username by profileViewModel.getUsername().observeAsState("")
     val userEmail by profileViewModel.getEmail().observeAsState("")
-    val imageUri by profileViewModel.getProfileImageUrl().collectAsState()
 
     Column(
         modifier = Modifier
