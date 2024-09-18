@@ -52,6 +52,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
+import com.example.movietime.model.Movie
 import com.example.movietime.ui.theme.orange
 import com.example.movietime.utils.dummyMovies
 import com.example.movietime.viewmodels.ProfileViewModel
@@ -63,6 +64,9 @@ fun ProfileScreen(profileViewModel: ProfileViewModel,onEditProfileClicked:()->Un
     val username by profileViewModel.getUsername().observeAsState("")
     val userEmail by profileViewModel.getEmail().observeAsState("")
 
+    LaunchedEffect(Unit) {
+        profileViewModel.fetchMovieByMultipleGenres(genres!!)
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -182,7 +186,7 @@ fun ProfileScreen(profileViewModel: ProfileViewModel,onEditProfileClicked:()->Un
                     .fillMaxWidth(),
                 fontSize = 24.sp
             )
-            WatchedMoviesCarousel()
+            HorizontalMoviesCarousel()
             Text(
                 text = "Recommended Movies :",
                 color = Color.White,
@@ -190,7 +194,7 @@ fun ProfileScreen(profileViewModel: ProfileViewModel,onEditProfileClicked:()->Un
                     .fillMaxWidth(),
                 fontSize = 24.sp
             )
-            WatchedMoviesCarousel()
+            HorizontalMoviesCarousel()
             Text(
                 text = "Your Favourites:",
                 color = Color.White,
@@ -198,7 +202,8 @@ fun ProfileScreen(profileViewModel: ProfileViewModel,onEditProfileClicked:()->Un
                     .fillMaxWidth(),
                 fontSize = 24.sp
             )
-            WatchedMoviesCarousel()
+            val favouriteMoviesList by profileViewModel.favouritesMoviesList.collectAsState()
+            HorizontalMoviesCarousel(favouriteMoviesList)
         }
     }
 }
@@ -264,14 +269,14 @@ fun EditProfileImage(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun WatchedMoviesCarousel(onClick:()->Unit = {}){
+fun HorizontalMoviesCarousel(moviesList:List<Movie> = dummyMovies, onClick:()->Unit = {}){
     LazyRow(
         modifier = Modifier
             .padding(top = 10.dp, start = 5.dp, end = 20.dp)
             .fillMaxWidth()
     ) {
-        items(dummyMovies.size) { index->
-            val movie = dummyMovies[index]
+        items(moviesList.size) { index->
+            val movie = moviesList[index]
             Column(
                 modifier = Modifier
                     .wrapContentSize()
@@ -296,12 +301,21 @@ fun WatchedMoviesCarousel(onClick:()->Unit = {}){
                         .width(150.dp),
                 )
                 Text(
-                    text = "${movie.title}\n(${movie.yearOfRelease})",
+                    text = movie.title,
                     fontSize = 12.sp,
                     modifier = Modifier
                         .height(50.dp)
                         .width(150.dp),
-                    maxLines = 2,
+                    maxLines = 1,
+                    lineHeight = 14.sp
+                )
+                Text(
+                    text = "${movie.releaseDate})",
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .height(50.dp)
+                        .width(150.dp),
+                    maxLines = 1,
                     lineHeight = 14.sp
                 )
             }
