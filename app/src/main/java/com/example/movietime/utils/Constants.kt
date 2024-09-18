@@ -8,14 +8,15 @@ object Constants {
     // SHAREDPREF CONSTANTS
     const val PREFS_NAME = "app_prefs"
     const val DEFAULT_PROFILE_IMAGE_URI = "" // Default value if none is set
-    const val DEFAULT_USER_EMAIL = ""
-    const val DEFAULT_USER_NAME = ""
+    const val DEFAULT_USER_EMAIL = "user@gmail.com"
+    const val DEFAULT_USER_NAME = "anonymous_user"
     const val DEFAULT_GENDER = "Male"
 
     const val KEY_GENDER = "key_gender"
     const val KEY_PROFILE_IMAGE_URI = "key_profile_image_uri"
     const val KEY_USER_NAME = "key_user_name"
     const val KEY_USER_EMAIL = "key_user_email"
+
     //BOTTOM NAV ITEMS
     val BottomNavItems = listOf(
         BottomNavItem(

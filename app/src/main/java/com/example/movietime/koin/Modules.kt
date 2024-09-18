@@ -27,7 +27,7 @@ val appModule  = module {
     single { StateManager(get()) }
 
     // Inject StateManager into ProfileViewModel
-    viewModel { ProfileViewModel(get()) }
+    viewModel { ProfileViewModel(get(),get()) }
     viewModel { MainViewModel(get()) }
     viewModel { UserRegistrationViewModel() }
 }

@@ -6,12 +6,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movietime.model.Genre
+import com.example.movietime.model.Movie
+import com.example.movietime.movieservice.MovieService
 import com.example.movietime.sharedpreference.StateManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ProfileViewModel(private val stateManager: StateManager) : ViewModel() {
+const val TAG = "ProfileViewModel"
+class ProfileViewModel(private val stateManager: StateManager,private val movieService: MovieService) : ViewModel() {
     private val genres = listOf(
         Genre(1, "Family"),
         Genre(2, "Drama"),
@@ -25,6 +28,8 @@ class ProfileViewModel(private val stateManager: StateManager) : ViewModel() {
     private val _email = MutableLiveData(stateManager.getUserEmail())
     private val _profileImageUrl = MutableStateFlow(stateManager.getProfileImageUrl())
     private val _favouriteGenresList = MutableLiveData(genres)
+    private val _favouritesMoviesList = MutableStateFlow<List<Movie>>(emptyList())
+    val favouritesMoviesList:MutableStateFlow<List<Movie>> get() = _favouritesMoviesList
 
     fun getFavouriteGenresList() : LiveData<List<Genre>> = _favouriteGenresList
     fun getGender() : LiveData<String> = _gender
@@ -75,4 +80,15 @@ class ProfileViewModel(private val stateManager: StateManager) : ViewModel() {
         _favouriteGenresList.postValue(genres)
     }
 
+    fun fetchMovieByMultipleGenres(genres : List<Genre>) {
+        viewModelScope.launch {
+            try {
+                val genresString = genres.joinToString(","){ it.genreName}
+                val movies = movieService.getMovieByMultipleGenres(genresString)
+                _favouritesMoviesList.value = movies
+            } catch (e: Exception) {
+                Log.d(TAG," related movies $e")
+            }
+        }
+    }
 }
