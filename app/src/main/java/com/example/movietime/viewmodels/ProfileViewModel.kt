@@ -11,9 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-enum class Gender(val id : Int){
-    MALE(0),FEMALE(1),OTHERS(2)
-}
 class ProfileViewModel(private val stateManager: StateManager) : ViewModel() {
     private val genres = listOf(
         Genre(1, "Family"),
@@ -21,28 +18,34 @@ class ProfileViewModel(private val stateManager: StateManager) : ViewModel() {
         Genre(3, "Action"),
         Genre(4, "Horror")
     )
-    private val _gender = MutableLiveData(Gender.MALE)
-    private val _username = MutableLiveData("Shashank")
+    private val _gender = MutableLiveData(stateManager.getGender())
+    private val _username = MutableLiveData(stateManager.getUserName())
     private val _firstname = MutableLiveData("Shashank")
     private val _lastname = MutableLiveData("S P")
-    private val _email = MutableLiveData("shashanksp1512@gmail.com")
+    private val _email = MutableLiveData(stateManager.getUserEmail())
     private val _profileImageUrl = MutableStateFlow(stateManager.getProfileImageUrl())
     private val _favouriteGenresList = MutableLiveData(genres)
 
     fun getFavouriteGenresList() : LiveData<List<Genre>> = _favouriteGenresList
-    fun getGender() : LiveData<Gender> = _gender
+    fun getGender() : LiveData<String> = _gender
     fun getUsername() : LiveData<String> = _username
     fun getFirstName() : LiveData<String> = _firstname
     fun getLastName() : LiveData<String> = _lastname
     fun getEmail() : LiveData<String> = _email
     fun getProfileImageUrl() : StateFlow<String> = _profileImageUrl
 
-    fun setGender(gender: Gender){
+    fun setGender(gender: String){
         _gender.postValue(gender)
+        viewModelScope.launch {
+            stateManager.setGender(gender)
+        }
     }
 
     fun setUserName(username: String){
         _username.postValue(username)
+        viewModelScope.launch {
+            stateManager.setUserName(username)
+        }
     }
 
     fun setFirstName(firstName: String){
@@ -55,6 +58,9 @@ class ProfileViewModel(private val stateManager: StateManager) : ViewModel() {
 
     fun setEmail(email: String){
         _email.postValue(email)
+        viewModelScope.launch {
+            stateManager.setUserEmail(email)
+        }
     }
 
     fun setProfileImageUrl(imageUrl: String){
