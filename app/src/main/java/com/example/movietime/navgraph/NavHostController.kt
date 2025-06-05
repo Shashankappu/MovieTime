@@ -12,17 +12,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.movietime.model.Movie
 import com.example.movietime.ui.screens.EditProfileScreen
-import com.example.movietime.ui.screens.HomeScreen
+import com.example.movietime.ui.screens.HomeRoute
 import com.example.movietime.ui.screens.MovieDetailsScreen
 import com.example.movietime.ui.screens.ProfileScreen
 import com.example.movietime.ui.screens.SearchScreen
 import com.example.movietime.ui.screens.UserRegistrationScreen
+import com.example.movietime.viewmodels.MainViewModel
 import com.example.movietime.viewmodels.ProfileViewModel
 import com.google.gson.Gson
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun NavHostContainer(
+fun AppNavHost(
     navController: NavHostController,
     padding: PaddingValues
 ) {
@@ -32,15 +33,18 @@ fun NavHostContainer(
         startDestination = Screen.USER_REGISTRATION,
         modifier = Modifier.padding(paddingValues = padding),
         builder = {
-            composable(route=Screen.USER_REGISTRATION){
+            composable(route = Screen.USER_REGISTRATION){
                 UserRegistrationScreen {
-                    navController.navigate("home")
+                    navController.navigate(Screen.HOME)
                 }
             }
-            composable(Screen.HOME) {
-                HomeScreen { movie ->
+            composable(route = Screen.HOME) {
+                val mainViewModel: MainViewModel = koinViewModel()
+                HomeRoute(
+                    mainViewModel = mainViewModel
+                ) { movie ->
                     val movieJson = Uri.encode(Gson().toJson(movie))
-                    navController.navigate("details/$movieJson"){
+                    navController.navigate("details/$movieJson") {
                         launchSingleTop = true
                         popUpTo("details") {
                             inclusive = true

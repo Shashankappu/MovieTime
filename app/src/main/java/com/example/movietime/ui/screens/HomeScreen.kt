@@ -1,7 +1,6 @@
 package com.example.movietime.ui.screens
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -54,53 +53,75 @@ import com.example.movietime.utils.dummyMovies
 import com.example.movietime.viewmodels.MainViewModel
 import org.koin.androidx.compose.koinViewModel
 
-private  val TAG = "HomeScreen"
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(onClick: (movieData:Movie) -> Unit) {
-    val mainViewModel: MainViewModel = koinViewModel()
+fun HomeRoute(
+    mainViewModel: MainViewModel,
+    onMovieItemClicked :  (movieData:Movie) -> Unit
+){
+    HomeScreen(
+        mainViewModel = mainViewModel,
+        onMovieItemClicked = onMovieItemClicked
+    )
+}
+
+@Composable
+fun HomeScreen(
+    mainViewModel: MainViewModel,
+    onMovieItemClicked: (movieData : Movie) -> Unit
+) {
     val moviesList by mainViewModel.moviesList.collectAsState()
     val topRatedMoviesList by mainViewModel.topRatedMoviesList.collectAsState()
-    val appNametext = buildAnnotatedString {
+
+    val appName = buildAnnotatedString {
         withStyle(style = SpanStyle(color = orange)) {
-            append("MoovY")
+            append(stringResource(R.string.app_name_text_moovy))
         }
         withStyle(style = SpanStyle(color = Color.White)) {
-            append(" Flix")
+            append(stringResource(R.string.app_name_text_flix))
         }
     }
+
     LaunchedEffect(Unit) {
         if(moviesList.isEmpty()) mainViewModel.fetchMovies()
         if(topRatedMoviesList.isEmpty()) mainViewModel.fetchTopRatedMovies()
-        Log.d("Shashank","moviesList: $moviesList")
-        Log.d("Shashank","topRatedMoviesList: $topRatedMoviesList")
     }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ){
         Text(
-            text = appNametext,
+            text = appName,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 20.dp),
             fontSize = 24.sp
         )
-        NowPlayingMovieCard(onClick)
+
+        NowPlayingMovieCard(onMovieItemClicked = onMovieItemClicked)
+
         Text(
-            "Top Rated",
+            stringResource(R.string.title_text_top_rated),
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 20.dp),
             fontSize = 24.sp
         )
-        TopRatedCarousel(topRatedMoviesList,onClick)
+
+        TopRatedCarousel(
+            topRatedMoviesList = topRatedMoviesList,
+            onMovieItemClicked = onMovieItemClicked
+        )
     }
 }
 
 @Composable
-fun NowPlayingMovieCard(onClick:(movieData:Movie)->Unit){
+fun NowPlayingMovieCard(
+    onMovieItemClicked: (movieData:Movie) ->Unit
+){
     Box(
         modifier = Modifier
             .padding(horizontal = 20.dp)
             .size(350.dp, 205.dp)
             .clip(shape = RoundedCornerShape(12))
-            .clickableWithoutRipple { onClick(dummyMovies[0]) }
+            .clickableWithoutRipple { onMovieItemClicked(dummyMovies[0]) }
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -110,51 +131,61 @@ fun NowPlayingMovieCard(onClick:(movieData:Movie)->Unit){
             placeholder = painterResource(R.drawable.godfather),
             contentDescription = stringResource(R.string.app_name),
             contentScale = ContentScale.FillBounds,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
         )
-        Box(
+
+        ContinueWatchingButton(
             modifier = Modifier
                 .size(230.dp, 70.dp)
                 .padding(start = 10.dp, bottom = 10.dp)
                 .background(
-                    Brush.linearGradient(
+                    brush = Brush.linearGradient(
                         colors = listOf(
                             Color(0xFFDADADA).copy(alpha = 0.4f),
                             Color(0xFFDADADA).copy(alpha = 0.4f)
                         )
-                    ),shape = RoundedCornerShape(30)
+                    ),
+                    shape = RoundedCornerShape(30)
                 )
                 .border(BorderStroke(2.dp, Color.Gray.copy(0.4f)), RoundedCornerShape(30))
                 .align(Alignment.BottomStart)
+        )
+    }
+}
+
+@Composable
+private fun ContinueWatchingButton(modifier: Modifier) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(5.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(5.dp)
-            ) {
-                // Play button
-                Icon(
-                    painter = painterResource(id = R.drawable.play),
-                    tint = orange,
-                    contentDescription = "play"
+            // Play button
+            Icon(
+                painter = painterResource(id = R.drawable.play),
+                tint = orange,
+                contentDescription = "play"
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Column {
+                Text(
+                    text = stringResource(R.string.title_text_top_rated),
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
                 )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Column {
-                    Text(
-                        text = "Continue Watching",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Ready Player One",
-                        color = Color.White,
-                        fontSize = 14.sp
-                    )
-                }
+                Text(
+                    text = stringResource(R.string.title_desc_ready_player_one),
+                    color = Color.White,
+                    fontSize = 14.sp
+                )
             }
         }
     }
@@ -165,7 +196,7 @@ fun TopRatedMovieCard(
     movieData : Movie,
     alpha: Float = 1f,
     scale: Float = 1f,
-    onClick : (movieData:Movie) -> Unit = {}
+    onMovieItemClicked : (movieData:Movie) -> Unit = {}
 ){
     Box(
         modifier = Modifier
@@ -177,7 +208,7 @@ fun TopRatedMovieCard(
                 scaleY = scale
             }
             .clickableWithoutRipple {
-                onClick(movieData)
+                onMovieItemClicked(movieData)
             }
             .clip(shape = RoundedCornerShape(12)),
         contentAlignment = Alignment.Center
@@ -192,12 +223,12 @@ fun TopRatedMovieCard(
             contentScale = ContentScale.FillBounds,
             modifier = Modifier.fillMaxSize(),
         )
-        Box(
+        MovieTitleCard(
             modifier = Modifier
                 .size(230.dp, 70.dp)
                 .padding(bottom = 10.dp)
                 .background(
-                    Brush.linearGradient(
+                    brush = Brush.linearGradient(
                         colors = listOf(
                             Color(0xFFDADADA).copy(alpha = 0.4f),
                             Color(0xFFDADADA).copy(alpha = 0.4f)
@@ -207,16 +238,10 @@ fun TopRatedMovieCard(
                 )
                 .border(BorderStroke(2.dp, Color.Gray.copy(0.4f)), RoundedCornerShape(30))
                 .align(Alignment.BottomCenter),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = movieData.title,
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-        Box(
+            movieTitle = movieData.title
+        )
+
+        MovieStarRatingCard(
             modifier = Modifier
                 .padding(10.dp)
                 .size(78.dp, 46.dp)
@@ -231,59 +256,91 @@ fun TopRatedMovieCard(
                 )
                 .border(BorderStroke(2.dp, Color.Gray.copy(0.4f)), RoundedCornerShape(30))
                 .align(Alignment.TopEnd),
-            contentAlignment = Alignment.Center
+            movieRating = movieData.voteAverage
+        )
+    }
+}
+
+@Composable
+private fun MovieStarRatingCard(
+    modifier: Modifier,
+    movieRating: Double
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(5.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.Bottom
         ) {
-            Row(
+            Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(5.dp),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.Bottom
-            ){
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "IMDb",
-                        color = Color.White,
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(0.5f)
-                    )
-                    Icon(
-                        painter = painterResource(id = R.drawable.star_rating_icon),
-                        contentDescription = "Star",
-                        tint = Color(0xFFF3BE00),
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(0.5f)
-                    )
-                }
-                Spacer(modifier = Modifier.width(5.dp))
+                    .fillMaxHeight()
+                    .weight(1f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
-                    text = "${movieData.voteAverage}",
-                    fontSize = 16.sp,
+                    text = stringResource(R.string.text_imdb),
                     color = Color.White,
+                    fontSize = 8.sp,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .fillMaxHeight()
-                        .weight(1f)
-                        .padding(top = 15.dp)
+                        .weight(0.5f)
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.star_rating_icon),
+                    contentDescription = "Star",
+                    tint = Color(0xFFF3BE00),
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(0.5f)
                 )
             }
+            Spacer(modifier = Modifier.width(5.dp))
+            Text(
+                text = "$movieRating",
+                fontSize = 16.sp,
+                color = Color.White,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f)
+                    .padding(top = 15.dp)
+            )
         }
+    }
+}
+
+@Composable
+private fun MovieTitleCard(
+    modifier: Modifier,
+    movieTitle: String
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = movieTitle,
+            color = Color.White,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TopRatedCarousel(topRatedMoviesList:List<Movie>,onClick: (movieData: Movie) -> Unit) {
+fun TopRatedCarousel(
+    topRatedMoviesList:List<Movie>,
+    onMovieItemClicked: (movieData: Movie) -> Unit
+) {
     Box(modifier = Modifier.fillMaxSize()) {
         if(topRatedMoviesList.isNotEmpty()) {
             val pagerState = rememberPagerState(initialPage = 1,pageCount = { topRatedMoviesList.size })
@@ -294,8 +351,12 @@ fun TopRatedCarousel(topRatedMoviesList:List<Movie>,onClick: (movieData: Movie) 
             ) { index ->
                 val scale = if (pagerState.currentPage == index) 1.05f else 0.85f
                 val alpha = if (pagerState.currentPage == index) 1f else 0.85f
-                TopRatedMovieCard(topRatedMoviesList[index], scale = scale, alpha = alpha){
-                    onClick(topRatedMoviesList[index])
+                TopRatedMovieCard(
+                    movieData = topRatedMoviesList[index],
+                    scale = scale,
+                    alpha = alpha
+                ){
+                    onMovieItemClicked(topRatedMoviesList[index])
                 }
             }
         }

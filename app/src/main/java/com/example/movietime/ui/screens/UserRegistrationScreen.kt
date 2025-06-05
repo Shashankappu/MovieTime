@@ -40,7 +40,9 @@ import com.example.movietime.viewmodels.UserRegistrationViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun UserRegistrationScreen(register:()->Unit) {
+fun UserRegistrationScreen(
+    register: () -> Unit
+) {
     val profileViewModel:ProfileViewModel = koinViewModel()
     val userRegistrationViewModel: UserRegistrationViewModel = koinViewModel()
     val context = LocalContext.current.applicationContext

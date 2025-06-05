@@ -10,7 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.example.movietime.navgraph.NavHostContainer
+import com.example.movietime.navgraph.AppNavHost
 import com.example.movietime.ui.screens.BottomNavigationBar
 import com.example.movietime.ui.theme.MovieTimeTheme
 import com.example.movietime.ui.theme.bgPurple
@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
                         }
                     )
                     { padding ->
-                        NavHostContainer(navController = navController, padding = padding)
+                        AppNavHost(navController = navController, padding = padding)
                     }
                 }
 

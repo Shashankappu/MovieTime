@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">MovieTime</string>
+    <string name="app_name_text_moovy">MoovY</string>
+    <string name="app_name_text_flix"> Flix</string>
+    <string name="title_text_top_rated">Top Rated</string>
+
+    <string name="title_text_now_playing">Now Playing</string>
+    <string name="title_text_continue_watching">Continue Watching</string>
+    <string name="title_desc_ready_player_one">Ready Player On</string>
+    <string name="text_imdb">IMDb</string>
 </resources>

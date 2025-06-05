@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val movieService: MovieService) : ViewModel(){
-    private val TAG:String = "MainViewModel"
+
+    companion object { private const val TAG = "MainViewModel" }
+
     private val _query = MutableStateFlow("")
     private val _moviesList = MutableStateFlow<List<Movie>>(emptyList())
     private val _searchedMoviesList = MutableStateFlow<List<Movie>>(emptyList())
@@ -18,15 +20,17 @@ class MainViewModel(private val movieService: MovieService) : ViewModel(){
     private val _moviesByGenreList = MutableStateFlow<List<Movie>>(emptyList())
     private val _relatedMoviesList = MutableStateFlow<List<Movie>>(emptyList())
     private val _isFullScreenEnabled = MutableStateFlow(false)
+
     val moviesList: MutableStateFlow<List<Movie>> get() = _moviesList
     val relatedMoviesList:MutableStateFlow<List<Movie>> get() = _relatedMoviesList
 
-    fun getQuery(): StateFlow<String> = _query
     val searchedMoviesList: MutableStateFlow<List<Movie>> get() = _searchedMoviesList
     val topRatedMoviesList: MutableStateFlow<List<Movie>> get() = _topRatedMoviesList
     val moviesByGenreList : MutableStateFlow<List<Movie>> get() = _moviesByGenreList
 
+    fun getQuery(): StateFlow<String> = _query
     fun isFullScreenEnabled(): StateFlow<Boolean> = _isFullScreenEnabled
+
     fun setFullScreenEnabled(enabled: Boolean) {
         _isFullScreenEnabled.value = enabled
     }

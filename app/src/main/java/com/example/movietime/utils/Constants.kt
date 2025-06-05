@@ -17,6 +17,8 @@ object Constants {
     const val KEY_USER_NAME = "key_user_name"
     const val KEY_USER_EMAIL = "key_user_email"
 
+    const val BASE_URL = "movies"
+
     //BOTTOM NAV ITEMS
     val BottomNavItems = listOf(
         BottomNavItem(
