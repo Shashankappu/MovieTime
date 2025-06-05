@@ -3,14 +3,14 @@ package com.example.movietime.ui.screens
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.movietime.ui.theme.bgPurple
+import com.example.movietime.navgraph.Screen
 import com.example.movietime.ui.theme.orange
 import com.example.movietime.utils.Constants
 
@@ -20,9 +20,9 @@ fun BottomNavigationBar(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
     val currentRoute = navBackStackEntry?.destination?.route
-    if(currentRoute!="user_registration") {
+    if(currentRoute!=Screen.USER_REGISTRATION) {
         BottomNavigation(
-            backgroundColor = bgPurple
+            backgroundColor = MaterialTheme.colorScheme.background
         ) {
             Constants.BottomNavItems.forEach { navItem ->
                 val isSelected = currentRoute == navItem.route
@@ -44,7 +44,9 @@ fun BottomNavigationBar(navController: NavHostController) {
                         Icon(
                             painter = painterResource(id = navItem.icon),
                             contentDescription = navItem.label,
-                            tint = if (isSelected) orange else Color.Gray.copy(alpha = 0.3f)
+                            tint =
+                                if (isSelected) orange
+                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                         )
                     },
                     label = {

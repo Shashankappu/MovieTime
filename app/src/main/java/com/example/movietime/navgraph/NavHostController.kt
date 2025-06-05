@@ -15,6 +15,7 @@ import com.example.movietime.ui.screens.EditProfileScreen
 import com.example.movietime.ui.screens.HomeRoute
 import com.example.movietime.ui.screens.MovieDetailsScreen
 import com.example.movietime.ui.screens.ProfileScreen
+import com.example.movietime.ui.screens.SearchRoute
 import com.example.movietime.ui.screens.SearchScreen
 import com.example.movietime.ui.screens.UserRegistrationScreen
 import com.example.movietime.viewmodels.MainViewModel
@@ -55,7 +56,8 @@ fun AppNavHost(
 
             // route : search
             composable(Screen.SEARCH) {
-                SearchScreen{ movie ->
+                val mainViewModel : MainViewModel = koinViewModel()
+                SearchRoute(mainViewModel){ movie ->
                     val movieJson = Uri.encode(Gson().toJson(movie))
                     navController.navigate("details/$movieJson"){
                         launchSingleTop = true

@@ -1,7 +1,6 @@
 package com.example.movietime.ui.screens
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
@@ -33,7 +33,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,21 +53,50 @@ import com.example.movietime.R
 import com.example.movietime.extension.clickableWithoutRipple
 import com.example.movietime.model.Movie
 import com.example.movietime.ui.theme.orange
+import com.example.movietime.utils.GENRE
+import com.example.movietime.utils.dummyMovies
 import com.example.movietime.viewmodels.MainViewModel
-import org.koin.androidx.compose.koinViewModel
+import kotlin.enums.EnumEntries
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun SearchScreen(onClick: (movieData: Movie) -> Unit) {
-    val mainViewModel : MainViewModel = koinViewModel()
+fun SearchRoute(
+    mainViewModel: MainViewModel,
+    onMovieItemClick: (movieData: Movie) -> Unit
+){
+    SearchScreen(
+        mainViewModel = mainViewModel,
+        onMovieItemClick = onMovieItemClick
+    )
+}
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun SearchScreen(
+    mainViewModel: MainViewModel,
+    onMovieItemClick: (movieData: Movie) -> Unit
+) {
+    val searchQuery by mainViewModel.getQuery().collectAsState()
+    val moviesList by mainViewModel.searchedMoviesList.collectAsState(dummyMovies)
+    val selectedTabIndex by remember { mutableIntStateOf(0) }
+    val tabTitles = GENRE.entries.toList()
+
+    LaunchedEffect(Unit) {
+        if (moviesList.isEmpty()) {
+            if(selectedTabIndex!=0) {
+                mainViewModel.fetchMoviesBySearchQuery("", tabTitles[selectedTabIndex].name)
+            }
+            else mainViewModel.fetchMoviesBySearchQuery("",null)
+        }
+    }
+
     Column(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top
     ) {
         Text(
-            text = "Find Movies, Tv series,\nand more..",
+            text = stringResource(R.string.title_text_find_movies),
             fontSize = 24.sp,
             fontWeight = FontWeight.Medium,
             lineHeight = 36.sp,
@@ -76,22 +104,45 @@ fun SearchScreen(onClick: (movieData: Movie) -> Unit) {
                 .padding(top = 20.dp, start = 24.dp)
                 .size(283.dp, 72.dp)
         )
-        SearchBox(mainViewModel)
-        GenreRecommendationTabLayout(mainViewModel)
-        StaggeredMovieLayout(mainViewModel,onClick)
+        SearchBox(
+            searchQuery = searchQuery,
+            onSearchQueryChanged = {
+                mainViewModel.setQuery(it)
+                mainViewModel.fetchMoviesBySearchQuery(it,null)
+            }
+
+        )
+        GenreTabLayout(
+            selectedTabIndex = selectedTabIndex,
+            genreList = GENRE.entries,
+            onTabSelection = { index ->
+                if(selectedTabIndex == GENRE.ALL.id)
+                    mainViewModel.fetchMoviesBySearchQuery(searchQuery,null)
+                else
+                    mainViewModel.fetchMoviesBySearchQuery(searchQuery,tabTitles[index].name)
+            }
+        )
+        StaggeredMovieLayout(moviesList = moviesList, onMovieItemClick = onMovieItemClick)
     }
 }
 
 @Composable
-fun SearchBox(mainViewModel: MainViewModel){
-    val query by mainViewModel.getQuery().collectAsState()
+fun SearchBox(
+    searchQuery: String,
+    onSearchQueryChanged: (query: String) -> Unit
+){
     TextField(
-        value = query,
+        value = searchQuery,
         onValueChange = {
-            mainViewModel.setQuery(it)
-            mainViewModel.fetchMoviesBySearchQuery(it,null)
+            onSearchQueryChanged(it)
         },
-        placeholder = { Text(text = "Search", color = Color.Gray, fontSize = 16.sp) },
+        placeholder = {
+            Text(
+                text = stringResource(R.string.text_search),
+                color = Color.Gray,
+                fontSize = 16.sp
+            )
+        },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Filled.Search,
@@ -112,24 +163,17 @@ fun SearchBox(mainViewModel: MainViewModel){
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            cursorColor = Color.Gray
+            cursorColor = MaterialTheme.colorScheme.onSurface
         )
     )
 }
 
 @Composable
-fun GenreRecommendationTabLayout(mainViewModel:MainViewModel){
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val moviesList by mainViewModel.searchedMoviesList.collectAsState()
-    val query by mainViewModel.getQuery().collectAsState()
-    val tabTitles = listOf("All","Action","Sci-Fi", "Adventure","Drama")
-    LaunchedEffect(Unit) {
-        if (moviesList.isEmpty()) {
-            if(selectedTabIndex!=0) mainViewModel.fetchMoviesBySearchQuery("",tabTitles[selectedTabIndex])
-            else mainViewModel.fetchMoviesBySearchQuery("",null)
-        }
-    }
-
+fun GenreTabLayout(
+    selectedTabIndex:Int,
+    genreList: EnumEntries<GENRE>,
+    onTabSelection :(Int) -> Unit
+){
     ScrollableTabRow(
         selectedTabIndex = selectedTabIndex,
         modifier = Modifier
@@ -151,19 +195,15 @@ fun GenreRecommendationTabLayout(mainViewModel:MainViewModel){
             )
         }
     ) {
-        tabTitles.forEachIndexed { index, title ->
+        genreList.forEachIndexed { index, item ->
             Tab(
                 selected = selectedTabIndex == index,
                 onClick = {
-                    selectedTabIndex = index
-                    if(selectedTabIndex == 0)
-                        mainViewModel.fetchMoviesBySearchQuery(query,null)
-                    else
-                        mainViewModel.fetchMoviesBySearchQuery(query,tabTitles[selectedTabIndex])
+                    onTabSelection(index)
                 },
                 text = {
                     Text(
-                        text = title,
+                        text = item.name,
                         color = if (selectedTabIndex == index) orange else Color.White,
                         fontSize = 16.sp,
                         maxLines = 1,
@@ -175,9 +215,10 @@ fun GenreRecommendationTabLayout(mainViewModel:MainViewModel){
 }
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun StaggeredMovieLayout(mainViewModel:MainViewModel,onClick : (movieData:Movie)-> Unit){
-    val moviesList by mainViewModel.searchedMoviesList.collectAsState()
-    Log.d("Shashank","moviesByGenreList: $moviesList")
+fun StaggeredMovieLayout(
+    moviesList : List<Movie>,
+    onMovieItemClick : (movieData:Movie) -> Unit
+){
     if(moviesList.isNotEmpty()) {
         LazyVerticalStaggeredGrid(
             columns = StaggeredGridCells.Fixed(2),
@@ -190,7 +231,7 @@ fun StaggeredMovieLayout(mainViewModel:MainViewModel,onClick : (movieData:Movie)
                         .padding(10.dp)
                         .fillMaxSize()
                         .clickableWithoutRipple {
-                            onClick(movie)
+                            onMovieItemClick(movie)
                         }
                 ) {
                     val height = if (index % 2 == 0) 184.dp else 160.dp
@@ -214,7 +255,7 @@ fun StaggeredMovieLayout(mainViewModel:MainViewModel,onClick : (movieData:Movie)
                 }
             }
         }
-    }else{
+    } else {
         Image(
             painter = painterResource(id = R.drawable.no_movies_found_img),
             contentDescription ="no movies found",

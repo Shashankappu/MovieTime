@@ -39,6 +39,16 @@ object Constants {
     )
 }
 
+enum class GENRE(val id:Int, name:String){
+    ALL(0,"All"),
+    ACTION(1,"Action"),
+    SCI_FI(2,"Sci-Fi"),
+    ADVENTURE(3,"Adventure"),
+    COMEDY(4,"Comedy"),
+    CRIME(5,"Crime")
+}
+
+
 // DUMMY DATA
 val dummyMovies = listOf(
     Movie(
